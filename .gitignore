@@ -5,3 +5,4 @@ __pycache__/
 htmlcov/
 staticfiles/
 docs/informe-pruebas.html
+.coverage
