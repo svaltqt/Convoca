@@ -93,7 +93,7 @@ Estas son la fuente de verdad. Si el código contradice esta sección, el códig
 
 4. Solo se puede proponer sobre asignaturas activas y periodos abiertos cuya
    `fecha_cierre_propuestas` no haya vencido.
-5. No puede existir más de una propuesta activa para la misma `(asignatura, periodo)`.
+5. No puede existir más de una propuesta activa para la misma `(asignatura, periodo)`. Se considera activa toda propuesta en cualquier estado distinto de RECHAZADA.
 6. Toda propuesta nueva empieza en estado `ABIERTA`.
 7. **Quien crea la propuesta queda automáticamente adherido a ella.**
 
