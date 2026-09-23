@@ -6,6 +6,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.html import format_html
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.detail import SingleObjectMixin
@@ -22,15 +24,22 @@ búsqueda, encabezados de la tabla y cómo se arma cada fila.
 
 class ListaConBusquedaView(SoloAdministradoresMixin, ListView):
     """
-    Listado con búsqueda de texto (parámetro ``q``) y paginación, listo
-    para el parcial componentes/tabla_listado.html.
+    Listado con búsqueda de texto (parámetro ``q``), filtro por estado,
+    filtro opcional por una relación (FK) y paginación, listo para el
+    parcial componentes/tabla_listado.html.
 
     Cada maestra declara:
       - model, template_name
       - campos_busqueda: lookups sobre los que buscar, p. ej. ["nombre__icontains"]
       - encabezados: encabezados de columna para la tabla
-      - fila(self, objeto): celdas de una fila (lista de valores/HTML seguro)
+      - fila(self, objeto): celdas de una fila (lista de valores/HTML seguro).
+        Para la celda de acciones, usar self.construir_acciones(objeto, activo).
+      - url_name_editar / url_name_desactivar / url_name_reactivar: nombres
+        de URL (con namespace) que usa construir_acciones()
       - get_url_crear() y texto_crear (opcionales, para el botón de creación)
+      - campo_filtro_relacion / etiqueta_filtro_relacion y
+        get_opciones_filtro_relacion() (opcionales, para filtrar por FK,
+        p. ej. programas por facultad)
     """
 
     paginate_by = 20
@@ -47,9 +56,30 @@ class ListaConBusquedaView(SoloAdministradoresMixin, ListView):
     valores_estado = ("activas", "inactivas", "todas")
     estado_por_defecto = "activas"
 
+    #: nombres de URL (con namespace) para las acciones de fila. Los usa
+    #: construir_acciones(); si una maestra arma sus acciones a mano, puede
+    #: dejarlos en None.
+    url_name_editar = None
+    url_name_desactivar = None
+    url_name_reactivar = None
+
+    #: nombre del campo de relación (FK) por el que además se puede filtrar,
+    #: p. ej. "facultad" en el listado de programas. None lo desactiva.
+    campo_filtro_relacion = None
+    etiqueta_filtro_relacion = None
+
     def get_estado(self):
         valor = self.request.GET.get("estado", self.estado_por_defecto)
         return valor if valor in self.valores_estado else self.estado_por_defecto
+
+    def get_opciones_filtro_relacion(self):
+        """Queryset de opciones para el <select> del filtro por relación."""
+        return
+
+    def get_valor_filtro_relacion(self):
+        if not self.campo_filtro_relacion:
+            return ""
+        return self.request.GET.get(self.campo_filtro_relacion, "")
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -64,10 +94,33 @@ class ListaConBusquedaView(SoloAdministradoresMixin, ListView):
                 queryset = queryset.filter(**{self.campo_activo: True})
             elif estado == "inactivas":
                 queryset = queryset.filter(**{self.campo_activo: False})
+
+        valor_relacion = self.get_valor_filtro_relacion()
+        if valor_relacion:
+            queryset = queryset.filter(**{f"{self.campo_filtro_relacion}__pk": valor_relacion})
+
         return queryset
 
     def fila(self, objeto):
         raise NotImplementedError("Defina fila() para construir las celdas de cada registro.")
+
+    def construir_acciones(self, objeto, activo):
+        """Celda de acciones estándar: Editar + Desactivar o Reactivar."""
+        acciones = format_html(
+            '<a href="{}">Editar</a>',
+            reverse(self.url_name_editar, args=[objeto.pk]),
+        )
+        if activo:
+            enlace_estado = format_html(
+                '<a href="{}" class="enlace-peligro">Desactivar</a>',
+                reverse(self.url_name_desactivar, args=[objeto.pk]),
+            )
+        else:
+            enlace_estado = format_html(
+                '<a href="{}">Reactivar</a>',
+                reverse(self.url_name_reactivar, args=[objeto.pk]),
+            )
+        return format_html("{} · {}", acciones, enlace_estado)
 
     def get_url_crear(self):
         return None
@@ -81,6 +134,15 @@ class ListaConBusquedaView(SoloAdministradoresMixin, ListView):
         contexto["url_crear"] = self.get_url_crear()
         contexto["texto_crear"] = self.texto_crear
         contexto["mensaje_vacio"] = self.mensaje_vacio
+        if self.campo_filtro_relacion:
+            contexto["filtro_relacion"] = {
+                "campo": self.campo_filtro_relacion,
+                "etiqueta": self.etiqueta_filtro_relacion or self.campo_filtro_relacion,
+                "valor": self.get_valor_filtro_relacion(),
+                "opciones": self.get_opciones_filtro_relacion(),
+            }
+        else:
+            contexto["filtro_relacion"] = None
         return contexto
 
 
