@@ -21,7 +21,7 @@ class Programa(models.Model):
         related_name="programas",
     )
     nombre = models.CharField("nombre", max_length=150)
-    codigo = models.CharField("código", max_length=20)
+    codigo = models.CharField("código", max_length=20, unique=True)
     activo = models.BooleanField("activo", default=True)
 
     class Meta:
@@ -47,6 +47,12 @@ class Asignatura(models.Model):
     class Meta:
         verbose_name = "asignatura"
         verbose_name_plural = "asignaturas"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["programa", "codigo"],
+                name="unico_codigo_por_programa",
+            )
+        ]
 
     def __str__(self):
         return self.nombre

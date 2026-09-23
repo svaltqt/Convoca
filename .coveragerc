@@ -4,3 +4,4 @@ omit =
     */apps.py
     */__init__.py
     */admin.py
+    */management/*
