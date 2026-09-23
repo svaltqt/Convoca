@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Asignaturas — Convoca{% endblock %}
+
+{% block content %}
+  <header class="encabezado-listado">
+    <div>
+      <h1>Asignaturas</h1>
+      <p class="texto-secundario">Crea, modifica y desactiva las asignaturas ofrecidas por los programas académicos.</p>
+    </div>
+    <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear }}</a>
+  </header>
+
+  {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado %}
+
+  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj mensaje_vacio="No hay asignaturas registradas." %}
+{% endblock %}

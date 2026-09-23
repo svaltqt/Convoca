@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Docente, Facultad, Programa
+from .models import Asignatura, Docente, Facultad, Programa
 
 
 class FacultadForm(forms.ModelForm):
@@ -32,3 +32,14 @@ class DocenteForm(forms.ModelForm):
     class Meta:
         model = Docente
         fields = ("nombre", "email", "disponible", "activo")
+
+
+class AsignaturaForm(forms.ModelForm):
+    class Meta:
+        model = Asignatura
+        fields = ("programa", "codigo", "nombre", "creditos", "activa")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Solo mostrar programas activos en el desplegable
+        self.fields["programa"].queryset = Programa.objects.filter(activo=True).order_by("nombre")

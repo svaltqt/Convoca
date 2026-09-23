@@ -60,4 +60,23 @@ urlpatterns = [
         views.DocenteReactivarView.as_view(),
         name="docente_reactivar",
     ),
+    path("asignaturas/", views.AsignaturaListView.as_view(), name="asignatura_lista"),
+    path(
+        "asignaturas/nueva/", views.AsignaturaCreateView.as_view(), name="asignatura_crear"
+    ),
+    path(
+        "asignaturas/<int:pk>/editar/",
+        views.AsignaturaUpdateView.as_view(),
+        name="asignatura_editar",
+    ),
+    path(
+        "asignaturas/<int:pk>/desactivar/",
+        views.AsignaturaDesactivarView.as_view(),
+        name="asignatura_desactivar",
+    ),
+    path(
+        "asignaturas/<int:pk>/reactivar/",
+        views.AsignaturaReactivarView.as_view(),
+        name="asignatura_reactivar",
+    ),
 ]
