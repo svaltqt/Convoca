@@ -1,0 +1,59 @@
+name: Pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: convoca_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SECRET_KEY: clave-solo-para-pruebas-de-integracion-continua
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/convoca_test
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Instalar dependencias
+        run: uv sync --frozen
+
+      - name: Verificar configuración de Django
+        run: uv run python manage.py check
+
+      - name: Verificar que no falten migraciones
+        run: uv run python manage.py makemigrations --check --dry-run
+
+      - name: Ejecutar pruebas
+        run: uv run pytest --create-db
+
+      - name: Publicar informe de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-pruebas
+          path: |
+            docs/informe-pruebas.html
+            htmlcov/
