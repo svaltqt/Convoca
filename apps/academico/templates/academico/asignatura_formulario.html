@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if object %}Editar asignatura{% else %}Nueva asignatura{% endblock %} — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>{% if object %}Editar asignatura{% else %}Nueva asignatura{% endif %}</h1>
+  </header>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">Guardar</button>
+    <a href="{% url 'academico:asignatura_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}

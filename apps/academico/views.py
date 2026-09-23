@@ -8,8 +8,8 @@ from config.views import (
     ReactivarView,
 )
 
-from .forms import FacultadForm, ProgramaForm
-from .models import Facultad, Programa
+from .forms import AsignaturaForm, DocenteForm, FacultadForm, ProgramaForm
+from .models import Asignatura, Docente, Facultad, Programa
 
 
 class FacultadListView(ListaConBusquedaView):
@@ -126,3 +126,125 @@ class ProgramaReactivarView(ReactivarView):
     template_name = "academico/programa_confirmar_reactivar.html"
     success_url = reverse_lazy("academico:programa_lista")
     mensaje_exito = "Se reactivó el programa."
+
+
+class DocenteListView(ListaConBusquedaView):
+    model = Docente
+    template_name = "academico/docente_lista.html"
+    ordering = ("nombre",)
+    campos_busqueda = ("nombre__icontains", "email__icontains")
+    encabezados = ("Nombre", "Correo", "Disponible", "Estado", "Acciones")
+    texto_crear = "Nuevo docente"
+    campo_activo = "activo"
+    url_name_editar = "academico:docente_editar"
+    url_name_desactivar = "academico:docente_desactivar"
+    url_name_reactivar = "academico:docente_reactivar"
+
+    def get_url_crear(self):
+        return reverse("academico:docente_crear")
+
+    def fila(self, docente):
+        acciones = self.construir_acciones(docente, docente.activo)
+        return [
+            docente.nombre,
+            docente.email,
+            "Sí" if docente.disponible else "No",
+            "Activo" if docente.activo else "Inactivo",
+            acciones,
+        ]
+
+
+class DocenteCreateView(CrearMaestraView):
+    model = Docente
+    form_class = DocenteForm
+    template_name = "academico/docente_formulario.html"
+    success_url = reverse_lazy("academico:docente_lista")
+    success_message = "Se creó el docente «%(nombre)s»."
+
+
+class DocenteUpdateView(EditarMaestraView):
+    model = Docente
+    form_class = DocenteForm
+    template_name = "academico/docente_formulario.html"
+    success_url = reverse_lazy("academico:docente_lista")
+    success_message = "Se actualizó el docente «%(nombre)s»."
+
+
+class DocenteDesactivarView(DesactivarView):
+    model = Docente
+    campo_activo = "activo"
+    template_name = "academico/docente_confirmar_desactivar.html"
+    success_url = reverse_lazy("academico:docente_lista")
+    mensaje_exito = "Se desactivó el docente."
+
+
+class DocenteReactivarView(ReactivarView):
+    model = Docente
+    campo_activo = "activo"
+    template_name = "academico/docente_confirmar_reactivar.html"
+    success_url = reverse_lazy("academico:docente_lista")
+    mensaje_exito = "Se reactivó el docente."
+
+
+class AsignaturaListView(ListaConBusquedaView):
+    model = Asignatura
+    template_name = "academico/asignatura_lista.html"
+    ordering = ("nombre",)
+    campos_busqueda = ("nombre__icontains", "codigo__icontains")
+    encabezados = ("Nombre", "Código", "Programa", "Créditos", "Estado", "Acciones")
+    texto_crear = "Nueva asignatura"
+    campo_activo = "activa"
+    url_name_editar = "academico:asignatura_editar"
+    url_name_desactivar = "academico:asignatura_desactivar"
+    url_name_reactivar = "academico:asignatura_reactivar"
+    campo_filtro_relacion = "programa"
+    etiqueta_filtro_relacion = "Programa"
+
+    def get_url_crear(self):
+        return reverse("academico:asignatura_crear")
+
+    def get_opciones_filtro_relacion(self):
+        return Programa.objects.filter(activo=True).order_by("nombre")
+
+    def fila(self, asignatura):
+        acciones = self.construir_acciones(asignatura, asignatura.activa)
+        return [
+            asignatura.nombre,
+            asignatura.codigo,
+            asignatura.programa.nombre,
+            asignatura.creditos,
+            "Activa" if asignatura.activa else "Inactiva",
+            acciones,
+        ]
+
+
+class AsignaturaCreateView(CrearMaestraView):
+    model = Asignatura
+    form_class = AsignaturaForm
+    template_name = "academico/asignatura_formulario.html"
+    success_url = reverse_lazy("academico:asignatura_lista")
+    success_message = "Se creó la asignatura «%(nombre)s»."
+
+
+class AsignaturaUpdateView(EditarMaestraView):
+    model = Asignatura
+    form_class = AsignaturaForm
+    template_name = "academico/asignatura_formulario.html"
+    success_url = reverse_lazy("academico:asignatura_lista")
+    success_message = "Se actualizó la asignatura «%(nombre)s»."
+
+
+class AsignaturaDesactivarView(DesactivarView):
+    model = Asignatura
+    campo_activo = "activa"
+    template_name = "academico/asignatura_confirmar_desactivar.html"
+    success_url = reverse_lazy("academico:asignatura_lista")
+    mensaje_exito = "Se desactivó la asignatura."
+
+
+class AsignaturaReactivarView(ReactivarView):
+    model = Asignatura
+    campo_activo = "activa"
+    template_name = "academico/asignatura_confirmar_reactivar.html"
+    success_url = reverse_lazy("academico:asignatura_lista")
+    mensaje_exito = "Se reactivó la asignatura."

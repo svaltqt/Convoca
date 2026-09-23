@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Desactivar asignatura — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Desactivar asignatura</h1>
+  </header>
+
+  <p>¿Deseas desactivar la asignatura <strong>{{ object.nombre }}</strong>? No estará disponible para nuevas propuestas mientras esté inactiva.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="boton boton--peligro">Desactivar</button>
+    <a href="{% url 'academico:asignatura_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}
