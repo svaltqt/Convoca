@@ -172,6 +172,12 @@ global alta a costa del tiempo.
 **Ejecución:** `uv run pytest`. La opción `--reuse-db` está activa para no recrear la base
 de prueba en cada corrida; si cambia el modelo, usar `uv run pytest --create-db`.
 
+**Alcance del ciclo estricto:** el flujo rojo-verde con commits `test:` y `feat:`
+separados aplica a la lógica de negocio de `apps/propuestas`. Las maestras, al ser CRUD
+sin reglas de dominio propias, se desarrollan con sus pruebas de vistas incluidas en un
+único commit `feat:` por entidad. Esta distinción es deliberada y se documenta en el
+informe de pruebas.
+
 ## Convenciones de código
 
 - Nombres de apps, modelos, campos, variables de dominio y mensajes de usuario en
@@ -189,6 +195,11 @@ de prueba en cada corrida; si cambia el modelo, usar `uv run pytest --create-db`
 - Fixtures de prueba con `model-bakery`, no con JSON.
 - `ruff` para formato y linting antes de cada commit.
 - Todo cambio de modelo va acompañado de su archivo de migración en el mismo commit.
+- Las vistas genéricas compartidas por las maestras viven en `config/views.py`:
+  `ListaConBusquedaView` (búsqueda y filtro por estado, con `campo_activo` configurable
+  porque unas entidades usan `activa` y otras `activo`), `DesactivarView` y
+  `ReactivarView`, ambas derivadas de `CambiarEstadoView`. Las plantillas compartidas
+  están en `templates/componentes/`. Una maestra nueva hereda de ahí, no duplica código.
 
 ## Flujo de Git
 
@@ -196,6 +207,8 @@ de prueba en cada corrida; si cambia el modelo, usar `uv run pytest --create-db`
 - Nombres de rama: `feat/maestra-asignaturas`, `test/adhesion-duplicada`,
   `docs/manual-usuario`, `chore/settings`.
 - Un pull request no debe esperar más de doce horas sin revisión.
+- Claude Code nunca ejecuta `git commit`, `git push` ni `git merge`. Al terminar un
+  cambio, resume qué se modificó y el desarrollador hace el commit manualmente.
 
 ## Requisitos de la entrega
 
