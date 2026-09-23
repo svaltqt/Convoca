@@ -134,6 +134,9 @@ Estas son la fuente de verdad. Si el código contradice esta sección, el códig
 
 21. El borrado de maestras es **lógico** (campo `activa`/`activo`), nunca físico: las
     propuestas históricas deben conservar sus referencias.
+22. El código de asignatura es único dentro de un programa, no globalmente: una misma
+    asignatura de ciclo básico se registra como un registro independiente por programa,
+    con su propio código.
 
 ## Proceso de trabajo: TDD obligatorio
 
