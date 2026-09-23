@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Desactivar facultad — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Desactivar facultad</h1>
+  </header>
+
+  <p>¿Deseas desactivar la facultad <strong>{{ object.nombre }}</strong>? Sus programas y asignaturas conservan la referencia; solo deja de estar disponible para nuevas propuestas.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="boton boton--peligro">Desactivar</button>
+    <a href="{% url 'academico:facultad_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}
