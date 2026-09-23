@@ -6,6 +6,7 @@ from config.views import (
     DesactivarView,
     EditarMaestraView,
     ListaConBusquedaView,
+    ReactivarView,
 )
 
 from .forms import FacultadForm
@@ -29,14 +30,16 @@ class FacultadListView(ListaConBusquedaView):
             reverse("academico:facultad_editar", args=[facultad.pk]),
         )
         if facultad.activa:
-            acciones = format_html(
-                "{} · {}",
-                acciones,
-                format_html(
-                    '<a href="{}">Desactivar</a>',
-                    reverse("academico:facultad_desactivar", args=[facultad.pk]),
-                ),
+            enlace_estado = format_html(
+                '<a href="{}" class="enlace-peligro">Desactivar</a>',
+                reverse("academico:facultad_desactivar", args=[facultad.pk]),
             )
+        else:
+            enlace_estado = format_html(
+                '<a href="{}">Reactivar</a>',
+                reverse("academico:facultad_reactivar", args=[facultad.pk]),
+            )
+        acciones = format_html("{} · {}", acciones, enlace_estado)
         return [facultad.nombre, "Activa" if facultad.activa else "Inactiva", acciones]
 
 
@@ -61,3 +64,10 @@ class FacultadDesactivarView(DesactivarView):
     template_name = "academico/facultad_confirmar_desactivar.html"
     success_url = reverse_lazy("academico:facultad_lista")
     mensaje_exito = "Se desactivó la facultad."
+
+
+class FacultadReactivarView(ReactivarView):
+    model = Facultad
+    template_name = "academico/facultad_confirmar_reactivar.html"
+    success_url = reverse_lazy("academico:facultad_lista")
+    mensaje_exito = "Se reactivó la facultad."

@@ -1,0 +1,28 @@
+{% comment %}
+Búsqueda por texto + filtro por estado (activas/inactivas/todas) para un
+listado de maestra. Se envía por GET para que la URL quede enlazable.
+
+Uso:
+  {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado %}
+
+Contexto esperado:
+  busqueda           — texto de búsqueda actual (cadena vacía si no hay).
+  estado             — valor actual del filtro: "activas", "inactivas" o "todas".
+  etiqueta_activas    — opcional, por defecto "Activas" (ajustar el género según el modelo: "Activos").
+  etiqueta_inactivas  — opcional, por defecto "Inactivas" ("Inactivos").
+{% endcomment %}
+<form method="get" class="filtro-listado">
+  <div class="campo">
+    <label class="campo__etiqueta" for="id_q">Buscar</label>
+    <input type="search" id="id_q" name="q" value="{{ busqueda }}" placeholder="Buscar por nombre">
+  </div>
+  <div class="campo">
+    <label class="campo__etiqueta" for="id_estado">Estado</label>
+    <select id="id_estado" name="estado">
+      <option value="activas" {% if estado == "activas" %}selected{% endif %}>{{ etiqueta_activas|default:"Activas" }}</option>
+      <option value="inactivas" {% if estado == "inactivas" %}selected{% endif %}>{{ etiqueta_inactivas|default:"Inactivas" }}</option>
+      <option value="todas" {% if estado == "todas" %}selected{% endif %}>Todas</option>
+    </select>
+  </div>
+  <button type="submit" class="boton boton--secundario">Filtrar</button>
+</form>

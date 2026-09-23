@@ -34,7 +34,7 @@ def test_estudiante_no_puede_acceder_al_listado_de_facultades(client):
 
 @pytest.mark.django_db
 def test_administrador_puede_consultar_el_listado_de_facultades(client):
-    baker.make(Facultad, nombre="Facultad de Ingenierías")
+    baker.make(Facultad, nombre="Facultad de Ingenierías", activa=True)
     client.force_login(crear_administrador())
 
     respuesta = client.get(reverse("academico:facultad_lista"))
@@ -45,8 +45,8 @@ def test_administrador_puede_consultar_el_listado_de_facultades(client):
 
 @pytest.mark.django_db
 def test_administrador_puede_buscar_facultades_por_nombre(client):
-    baker.make(Facultad, nombre="Facultad de Ingenierías")
-    baker.make(Facultad, nombre="Facultad de Ciencias Sociales")
+    baker.make(Facultad, nombre="Facultad de Ingenierías", activa=True)
+    baker.make(Facultad, nombre="Facultad de Ciencias Sociales", activa=True)
     client.force_login(crear_administrador())
 
     respuesta = client.get(reverse("academico:facultad_lista"), {"q": "Ingenier"})
@@ -54,6 +54,57 @@ def test_administrador_puede_buscar_facultades_por_nombre(client):
 
     assert "Facultad de Ingenierías" in contenido
     assert "Facultad de Ciencias Sociales" not in contenido
+
+
+@pytest.mark.django_db
+def test_listado_de_facultades_solo_muestra_activas_por_defecto(client):
+    baker.make(Facultad, nombre="Facultad Activa", activa=True)
+    baker.make(Facultad, nombre="Facultad Inactiva", activa=False)
+    client.force_login(crear_administrador())
+
+    respuesta = client.get(reverse("academico:facultad_lista"))
+    contenido = respuesta.content.decode()
+
+    assert "Facultad Activa" in contenido
+    assert "Facultad Inactiva" not in contenido
+
+
+@pytest.mark.django_db
+def test_listado_de_facultades_permite_filtrar_por_inactivas(client):
+    baker.make(Facultad, nombre="Facultad Activa", activa=True)
+    baker.make(Facultad, nombre="Facultad Inactiva", activa=False)
+    client.force_login(crear_administrador())
+
+    respuesta = client.get(reverse("academico:facultad_lista"), {"estado": "inactivas"})
+    contenido = respuesta.content.decode()
+
+    assert "Facultad Inactiva" in contenido
+    assert "Facultad Activa" not in contenido
+
+
+@pytest.mark.django_db
+def test_listado_de_facultades_permite_filtrar_por_todas(client):
+    baker.make(Facultad, nombre="Facultad Activa", activa=True)
+    baker.make(Facultad, nombre="Facultad Inactiva", activa=False)
+    client.force_login(crear_administrador())
+
+    respuesta = client.get(reverse("academico:facultad_lista"), {"estado": "todas"})
+    contenido = respuesta.content.decode()
+
+    assert "Facultad Activa" in contenido
+    assert "Facultad Inactiva" in contenido
+
+
+@pytest.mark.django_db
+def test_listado_ofrece_reactivar_para_una_facultad_inactiva(client):
+    baker.make(Facultad, nombre="Facultad Inactiva", activa=False)
+    client.force_login(crear_administrador())
+
+    respuesta = client.get(reverse("academico:facultad_lista"), {"estado": "todas"})
+    contenido = respuesta.content.decode()
+
+    assert "Reactivar" in contenido
+    assert "Desactivar" not in contenido
 
 
 @pytest.mark.django_db
@@ -105,3 +156,15 @@ def test_desactivar_facultad_no_la_elimina_fisicamente(client):
     assert respuesta.status_code == 302
     assert Facultad.objects.filter(pk=facultad.pk).exists()
     assert facultad.activa is False
+
+
+@pytest.mark.django_db
+def test_reactivar_facultad_la_vuelve_a_marcar_como_activa(client):
+    facultad = baker.make(Facultad, activa=False)
+    client.force_login(crear_administrador())
+
+    respuesta = client.post(reverse("academico:facultad_reactivar", args=[facultad.pk]))
+    facultad.refresh_from_db()
+
+    assert respuesta.status_code == 302
+    assert facultad.activa is True

@@ -13,4 +13,9 @@ urlpatterns = [
         views.FacultadDesactivarView.as_view(),
         name="facultad_desactivar",
     ),
+    path(
+        "facultades/<int:pk>/reactivar/",
+        views.FacultadReactivarView.as_view(),
+        name="facultad_reactivar",
+    ),
 ]

@@ -3,15 +3,15 @@
 {% block titulo %}Facultades — Convoca{% endblock %}
 
 {% block content %}
-  <header>
-    <h1>Facultades</h1>
-    <p class="texto-secundario">Crea, modifica y desactiva las facultades que agrupan los programas académicos.</p>
+  <header class="encabezado-listado">
+    <div>
+      <h1>Facultades</h1>
+      <p class="texto-secundario">Crea, modifica y desactiva las facultades que agrupan los programas académicos.</p>
+    </div>
+    <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear }}</a>
   </header>
 
-  <form method="get" class="campo">
-    <label class="campo__etiqueta" for="id_q">Buscar por nombre</label>
-    <input type="search" id="id_q" name="q" value="{{ busqueda }}" placeholder="Ej. Ingenierías">
-  </form>
+  {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado %}
 
-  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj url_crear=url_crear texto_crear=texto_crear mensaje_vacio="No hay facultades registradas." %}
+  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj mensaje_vacio="No hay facultades registradas." %}
 {% endblock %}

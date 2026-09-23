@@ -219,6 +219,35 @@ body {
   margin-bottom: var(--espacio-6);
 }
 
+.encabezado-listado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espacio-4);
+  flex-wrap: wrap;
+}
+
+.encabezado-listado h1 {
+  margin-bottom: var(--espacio-1);
+}
+
+.encabezado-listado p {
+  margin-bottom: 0;
+}
+
+.filtro-listado {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--espacio-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--espacio-6);
+}
+
+.filtro-listado .campo {
+  margin-bottom: 0;
+  max-width: 16rem;
+}
+
 /* ---------- 6. Cabecera (dos niveles) ---------- */
 /*
   Nivel 1 (identidad): fondo verde de marca puro. Solo lleva el wordmark en
@@ -578,12 +607,6 @@ input[type="radio"] {
   margin-top: var(--espacio-4);
 }
 
-.tabla-listado__barra {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--espacio-4);
-}
-
 .tabla-listado__scroll {
   overflow-x: auto;
   border: 1px solid var(--color-borde);
@@ -623,6 +646,15 @@ input[type="radio"] {
 
 .tabla tbody tr:hover {
   background: var(--color-fondo-sutil);
+}
+
+.enlace-peligro {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.enlace-peligro:hover {
+  color: #8f0d17;
 }
 
 .tabla-listado__vacio {

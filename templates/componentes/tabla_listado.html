@@ -1,9 +1,10 @@
 {% comment %}
 Tabla de listado con paginación, compartida por las maestras y la pantalla
-transaccional.
+transaccional. El botón de creación no vive aquí: va en la cabecera de la
+página, junto al título (ver componentes/encabezado-listado en estilos.css).
 
 Uso:
-  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj url_crear="#" texto_crear="Nueva asignatura" mensaje_vacio="No hay asignaturas registradas." %}
+  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj mensaje_vacio="No hay asignaturas registradas." %}
 
 Contexto esperado (se arma en la vista, no aquí):
   encabezados   — lista de strings para <th>.
@@ -12,17 +13,9 @@ Contexto esperado (se arma en la vista, no aquí):
                    acción (editar, ver adherentes...), márquela segura con
                    mark_safe en la vista.
   page_obj      — objeto Page de Django (opcional; si no hay paginación, se omite).
-  url_crear     — URL del botón de creación (opcional).
-  texto_crear   — texto del botón de creación (opcional, por defecto "Nuevo").
   mensaje_vacio — texto cuando no hay filas (opcional).
 {% endcomment %}
 <div class="tabla-listado">
-  {% if url_crear %}
-    <div class="tabla-listado__barra">
-      <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear|default:"Nuevo" }}</a>
-    </div>
-  {% endif %}
-
   {% if filas %}
     <div class="tabla-listado__scroll">
       <table class="tabla">
