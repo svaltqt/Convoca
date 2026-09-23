@@ -1,0 +1,23 @@
+{% comment %}
+Barra de progreso del quórum de una propuesta.
+
+Uso:
+  {% include "componentes/barra_quorum.html" with actual=propuesta.adhesiones.count minimo=propuesta.periodo.cupo_minimo %}
+
+Contexto esperado:
+  actual — número de adhesiones actuales.
+  minimo — cupo_minimo del periodo.
+
+El avance siempre se expresa también como texto ("X de Y interesados"): la
+barra no es la única forma de percibir el progreso.
+{% endcomment %}
+{% widthratio actual minimo 100 as porcentaje %}
+<div class="quorum" role="progressbar" aria-valuenow="{{ actual }}" aria-valuemin="0" aria-valuemax="{{ minimo }}" aria-label="Adhesiones hacia el cupo mínimo">
+  <div class="quorum__pista">
+    <div class="quorum__relleno" style="width: {% if porcentaje > 100 %}100{% else %}{{ porcentaje }}{% endif %}%;"></div>
+  </div>
+  <p class="quorum__texto">
+    <strong>{{ actual }}</strong> de {{ minimo }} interesados
+    {% if actual >= minimo %}<span class="quorum__lograda">· cupo mínimo alcanzado</span>{% endif %}
+  </p>
+</div>

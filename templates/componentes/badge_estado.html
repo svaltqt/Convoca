@@ -1,0 +1,23 @@
+{% comment %}
+Badge del estado de una propuesta.
+
+Uso:
+  {% include "componentes/badge_estado.html" with estado=propuesta.estado estado_display=propuesta.get_estado_display %}
+
+Contexto esperado:
+  estado         — código del estado: ABIERTA, QUORUM, RADICADA, APROBADA o RECHAZADA.
+  estado_display — texto legible a mostrar (p. ej. propuesta.get_estado_display).
+{% endcomment %}
+{% if estado == "ABIERTA" %}
+  <span class="badge badge--abierta">{{ estado_display|default:estado }}</span>
+{% elif estado == "QUORUM" %}
+  <span class="badge badge--quorum">{{ estado_display|default:estado }}</span>
+{% elif estado == "RADICADA" %}
+  <span class="badge badge--radicada">{{ estado_display|default:estado }}</span>
+{% elif estado == "APROBADA" %}
+  <span class="badge badge--aprobada">{{ estado_display|default:estado }}</span>
+{% elif estado == "RECHAZADA" %}
+  <span class="badge badge--rechazada">{{ estado_display|default:estado }}</span>
+{% else %}
+  <span class="badge">{{ estado_display|default:estado }}</span>
+{% endif %}

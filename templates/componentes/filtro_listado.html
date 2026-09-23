@@ -1,0 +1,43 @@
+{% comment %}
+Búsqueda por texto + filtro por estado (activas/inactivas/todas) y,
+opcionalmente, filtro por una relación (FK) para un listado de maestra. Se
+envía por GET para que la URL quede enlazable.
+
+Uso:
+  {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado filtro_relacion=filtro_relacion %}
+
+Contexto esperado:
+  busqueda            — texto de búsqueda actual (cadena vacía si no hay).
+  estado              — valor actual del filtro: "activas", "inactivas" o "todas".
+  etiqueta_activas    — opcional, por defecto "Activas" (ajustar el género según el modelo: "Activos").
+  etiqueta_inactivas  — opcional, por defecto "Inactivas" ("Inactivos").
+  filtro_relacion     — opcional; dict {campo, etiqueta, valor, opciones} que arma
+                         ListaConBusquedaView cuando la maestra declara
+                         campo_filtro_relacion (p. ej. programas por facultad).
+{% endcomment %}
+<form method="get" class="filtro-listado">
+  <div class="campo">
+    <label class="campo__etiqueta" for="id_q">Buscar</label>
+    <input type="search" id="id_q" name="q" value="{{ busqueda }}" placeholder="Buscar por nombre">
+  </div>
+  <div class="campo">
+    <label class="campo__etiqueta" for="id_estado">Estado</label>
+    <select id="id_estado" name="estado">
+      <option value="activas" {% if estado == "activas" %}selected{% endif %}>{{ etiqueta_activas|default:"Activas" }}</option>
+      <option value="inactivas" {% if estado == "inactivas" %}selected{% endif %}>{{ etiqueta_inactivas|default:"Inactivas" }}</option>
+      <option value="todas" {% if estado == "todas" %}selected{% endif %}>Todas</option>
+    </select>
+  </div>
+  {% if filtro_relacion %}
+    <div class="campo">
+      <label class="campo__etiqueta" for="id_filtro_relacion">{{ filtro_relacion.etiqueta }}</label>
+      <select id="id_filtro_relacion" name="{{ filtro_relacion.campo }}">
+        <option value="">Todas</option>
+        {% for opcion in filtro_relacion.opciones %}
+          <option value="{{ opcion.pk }}" {% if opcion.pk|stringformat:"s" == filtro_relacion.valor %}selected{% endif %}>{{ opcion }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endif %}
+  <button type="submit" class="boton boton--secundario">Filtrar</button>
+</form>
