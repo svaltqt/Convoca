@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Desactivar docente — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Desactivar docente</h1>
+  </header>
+
+  <p>¿Deseas desactivar el docente <strong>{{ object.nombre }}</strong>? No podrá ser asignado a nuevas propuestas mientras esté inactivo.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="boton boton--peligro">Desactivar</button>
+    <a href="{% url 'academico:docente_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}

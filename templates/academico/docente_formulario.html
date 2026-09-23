@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if object %}Editar docente{% else %}Nuevo docente{% endif %} — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>{% if object %}Editar docente{% else %}Nuevo docente{% endif %}</h1>
+  </header>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">Guardar</button>
+    <a href="{% url 'academico:docente_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}

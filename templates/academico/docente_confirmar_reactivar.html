@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Reactivar docente — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Reactivar docente</h1>
+  </header>
+
+  <p>¿Deseas reactivar el docente <strong>{{ object.nombre }}</strong>? Volverá a estar disponible para nuevas propuestas.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="boton boton--primario">Reactivar</button>
+    <a href="{% url 'academico:docente_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}

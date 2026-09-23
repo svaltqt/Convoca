@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Facultad, Programa
+from .models import Docente, Facultad, Programa
 
 
 class FacultadForm(forms.ModelForm):
@@ -26,3 +26,9 @@ class ProgramaForm(forms.ModelForm):
             # programa (regla 21: la desactivación conserva referencias).
             queryset = queryset | Facultad.objects.filter(pk=self.instance.facultad_id)
         self.fields["facultad"].queryset = queryset.order_by("nombre")
+
+
+class DocenteForm(forms.ModelForm):
+    class Meta:
+        model = Docente
+        fields = ("nombre", "email", "disponible", "activo")
