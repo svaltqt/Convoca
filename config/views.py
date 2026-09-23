@@ -97,12 +97,16 @@ class ListaConBusquedaView(SoloAdministradoresMixin, ListView):
 
         valor_relacion = self.get_valor_filtro_relacion()
         if valor_relacion:
-            queryset = queryset.filter(**{f"{self.campo_filtro_relacion}__pk": valor_relacion})
+            queryset = queryset.filter(
+                **{f"{self.campo_filtro_relacion}__pk": valor_relacion}
+            )
 
         return queryset
 
     def fila(self, objeto):
-        raise NotImplementedError("Defina fila() para construir las celdas de cada registro.")
+        raise NotImplementedError(
+            "Defina fila() para construir las celdas de cada registro."
+        )
 
     def construir_acciones(self, objeto, activo):
         """Celda de acciones estándar: Editar + Desactivar o Reactivar."""
@@ -154,7 +158,9 @@ class EditarMaestraView(SoloAdministradoresMixin, SuccessMessageMixin, UpdateVie
     """Edición de un registro de maestra: solo administradores."""
 
 
-class CambiarEstadoView(SoloAdministradoresMixin, SingleObjectMixin, TemplateResponseMixin, View):
+class CambiarEstadoView(
+    SoloAdministradoresMixin, SingleObjectMixin, TemplateResponseMixin, View
+):
     """
     Cambio de estado lógico genérico (activar o desactivar): nunca elimina
     el registro, solo escribe ``valor_destino`` en el campo indicado en
@@ -182,7 +188,9 @@ class CambiarEstadoView(SoloAdministradoresMixin, SingleObjectMixin, TemplateRes
 
     def get_success_url(self):
         if not self.success_url:
-            raise ImproperlyConfigured("Defina success_url en la vista de cambio de estado.")
+            raise ImproperlyConfigured(
+                "Defina success_url en la vista de cambio de estado."
+            )
         return self.success_url
 
 

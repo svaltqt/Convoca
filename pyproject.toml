@@ -24,3 +24,9 @@ dev = [
     "pytest-html>=4.2.0",
     "ruff>=0.16.8",
 ]
+
+[tool.ruff]
+exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+ignore = ["RUF012"]

@@ -27,10 +27,17 @@
         {% if user.is_authenticated %}
           <div class="cabecera__usuario">
             <span class="cabecera__usuario-nombre">{{ user.first_name|default:user.email }}</span>
-            <a href="#">Cerrar sesión</a>
+            <form method="post" action="{% url 'usuarios:salir' %}">
+              {% csrf_token %}
+              <button type="submit" class="enlace-boton">Cerrar sesión</button>
+            </form>
           </div>
         {% else %}
-          <a href="#" class="boton boton--sobre-marca">Iniciar sesión</a>
+          <div class="cabecera__usuario">
+            <a href="{% url 'usuarios:registro' %}">Crear cuenta</a>
+            <span aria-hidden="true">·</span>
+            <a href="{% url 'usuarios:entrar' %}">Iniciar sesión</a>
+          </div>
         {% endif %}
       </div>
     </div>

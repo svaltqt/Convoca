@@ -12,12 +12,25 @@ Uso:
 
 Contexto esperado:
   form — instancia de Form o ModelForm.
+
+Si el formulario no valida, además del mensaje junto a cada campo se
+muestra un resumen al inicio (no_field_errors y errores de campo juntos),
+para que se note de inmediato qué falta sin tener que recorrer todo el
+formulario.
 {% endcomment %}
-{% if form.non_field_errors %}
+{% if form.errors %}
   <div class="formulario__error-general" role="alert">
-    {% for error in form.non_field_errors %}
-      <p>{{ error }}</p>
-    {% endfor %}
+    <p class="formulario__error-titulo">Revisa lo siguiente antes de continuar:</p>
+    <ul>
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+      {% for field in form %}
+        {% for error in field.errors %}
+          <li>{{ field.label }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
   </div>
 {% endif %}
 

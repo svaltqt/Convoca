@@ -150,7 +150,9 @@ def test_desactivar_facultad_no_la_elimina_fisicamente(client):
     facultad = baker.make(Facultad, activa=True)
     client.force_login(crear_administrador())
 
-    respuesta = client.post(reverse("academico:facultad_desactivar", args=[facultad.pk]))
+    respuesta = client.post(
+        reverse("academico:facultad_desactivar", args=[facultad.pk])
+    )
     facultad.refresh_from_db()
 
     assert respuesta.status_code == 302

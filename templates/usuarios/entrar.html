@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block titulo %}Iniciar sesión — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Iniciar sesión</h1>
+  </header>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">Entrar</button>
+  </form>
+
+  <p class="texto-secundario">¿Aún no tienes cuenta? <a href="{% url 'usuarios:registro' %}">Regístrate aquí</a>.</p>
+{% endblock %}

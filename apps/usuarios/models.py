@@ -29,7 +29,9 @@ class Usuario(AbstractUser):
     username = None
     email = models.EmailField("correo institucional", unique=True)
     autorizo_datos = models.BooleanField("autorizó tratamiento de datos", default=False)
-    fecha_autorizacion = models.DateTimeField("fecha de autorización", null=True, blank=True)
+    fecha_autorizacion = models.DateTimeField(
+        "fecha de autorización", null=True, blank=True
+    )
     programa = models.ForeignKey(
         "academico.Programa",
         on_delete=models.PROTECT,
