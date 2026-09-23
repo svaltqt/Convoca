@@ -1,0 +1,70 @@
+{% comment %}
+Tabla de listado con paginación, compartida por las maestras y la pantalla
+transaccional.
+
+Uso:
+  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj url_crear="#" texto_crear="Nueva asignatura" mensaje_vacio="No hay asignaturas registradas." %}
+
+Contexto esperado (se arma en la vista, no aquí):
+  encabezados   — lista de strings para <th>.
+  filas         — lista de filas; cada fila es una lista de celdas ya
+                   formateadas para mostrar. Si una celda trae enlaces de
+                   acción (editar, ver adherentes...), márquela segura con
+                   mark_safe en la vista.
+  page_obj      — objeto Page de Django (opcional; si no hay paginación, se omite).
+  url_crear     — URL del botón de creación (opcional).
+  texto_crear   — texto del botón de creación (opcional, por defecto "Nuevo").
+  mensaje_vacio — texto cuando no hay filas (opcional).
+{% endcomment %}
+<div class="tabla-listado">
+  {% if url_crear %}
+    <div class="tabla-listado__barra">
+      <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear|default:"Nuevo" }}</a>
+    </div>
+  {% endif %}
+
+  {% if filas %}
+    <div class="tabla-listado__scroll">
+      <table class="tabla">
+        <thead>
+          <tr>
+            {% for encabezado in encabezados %}
+              <th scope="col">{{ encabezado }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for fila in filas %}
+            <tr>
+              {% for celda in fila %}
+                <td>{{ celda }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="tabla-listado__vacio">{{ mensaje_vacio|default:"No hay registros para mostrar." }}</p>
+  {% endif %}
+
+  {% if page_obj and page_obj.paginator.num_pages > 1 %}
+    <nav class="paginacion" aria-label="Paginación">
+      <span class="paginacion__resumen">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} · {{ page_obj.paginator.count }} en total
+      </span>
+      <span class="paginacion__enlaces">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="paginacion__enlace">Anterior</a>
+        {% else %}
+          <span class="paginacion__enlace paginacion__enlace--inactivo" aria-disabled="true">Anterior</span>
+        {% endif %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="paginacion__enlace">Siguiente</a>
+        {% else %}
+          <span class="paginacion__enlace paginacion__enlace--inactivo" aria-disabled="true">Siguiente</span>
+        {% endif %}
+      </span>
+    </nav>
+  {% endif %}
+</div>

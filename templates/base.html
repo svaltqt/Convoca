@@ -1,0 +1,80 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Convoca{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js" defer></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <a href="#contenido" class="salto-enlace">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="cabecera__identidad">
+      <div class="contenedor cabecera__identidad-interior">
+        <a href="/" class="marca">Convoca</a>
+        {% if user.is_authenticated %}
+          <div class="cabecera__usuario">
+            <span class="cabecera__usuario-nombre">{{ user.first_name|default:user.email }}</span>
+            <a href="#">Cerrar sesión</a>
+          </div>
+        {% else %}
+          <a href="#" class="boton boton--sobre-marca">Iniciar sesión</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Los href="#" se reemplazan por {% url %} cuando cada app defina sus rutas. #}
+    <nav class="navegacion" aria-label="Principal">
+      <div class="contenedor navegacion__interior">
+        <ul class="navegacion__lista">
+          {% if user.is_authenticated %}
+            <li><a href="#">Propuestas</a></li>
+            <li><a href="#">Reportes</a></li>
+            {% if user.is_staff %}
+              <li class="navegacion__separador" aria-hidden="true"></li>
+              <li><a href="#">Facultades y programas</a></li>
+              <li><a href="#">Asignaturas</a></li>
+              <li><a href="#">Docentes</a></li>
+              <li><a href="#">Periodos</a></li>
+              <li><a href="#">Usuarios</a></li>
+            {% endif %}
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  {% if messages %}
+    <div class="mensajes contenedor" role="status">
+      {% for message in messages %}
+        <div class="alerta alerta--{{ message.tags|default:'info' }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main class="contenedor contenido" id="contenido">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__interior">
+      <p>Convoca es un proyecto estudiantil del Politécnico Colombiano Jaime Isaza Cadavid y no es un canal oficial de la institución.</p>
+      <p>Esta plataforma registra intención de matrícula, no inscribe. La inscripción oficial se realiza por Universitas XXI, en las fechas del calendario académico.</p>
+    </div>
+  </footer>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,50 @@
+{% comment %}
+Campos de un formulario Django, con etiqueta, ayuda y errores ya
+maquetados. No incluye la etiqueta <form> ni el csrf_token: esos quedan en
+la plantilla que llama, porque el action y el method cambian según la vista.
+
+Uso:
+  <form method="post">
+    {% csrf_token %}
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">{{ texto_submit|default:"Guardar" }}</button>
+  </form>
+
+Contexto esperado:
+  form — instancia de Form o ModelForm.
+{% endcomment %}
+{% if form.non_field_errors %}
+  <div class="formulario__error-general" role="alert">
+    {% for error in form.non_field_errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% for field in form %}
+  <div class="campo{% if field.errors %} campo--error{% endif %}{% if field.field.widget.input_type == 'checkbox' %} campo--casilla{% endif %}">
+    {% if field.field.widget.input_type == 'checkbox' %}
+      <label class="campo__etiqueta-casilla" for="{{ field.id_for_label }}">
+        {{ field }}
+        <span>
+          {{ field.label }}
+          {% if field.field.required %}<span class="campo__requerido" aria-hidden="true">*</span>{% endif %}
+        </span>
+      </label>
+    {% else %}
+      <label class="campo__etiqueta" for="{{ field.id_for_label }}">
+        {{ field.label }}
+        {% if field.field.required %}<span class="campo__requerido" aria-hidden="true">*</span>{% endif %}
+      </label>
+      {{ field }}
+    {% endif %}
+
+    {% if field.help_text %}
+      <p class="campo__ayuda" id="{{ field.id_for_label }}-ayuda">{{ field.help_text }}</p>
+    {% endif %}
+
+    {% for error in field.errors %}
+      <p class="campo__error" role="alert">{{ error }}</p>
+    {% endfor %}
+  </div>
+{% endfor %}
