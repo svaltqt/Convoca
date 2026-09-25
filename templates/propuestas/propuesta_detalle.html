@@ -5,7 +5,7 @@
 {% block content %}
   <header class="propuesta-encabezado">
     <div class="propuesta-encabezado__texto">
-      <a href="{% url 'propuestas:propuesta_lista' %}" class="propuesta-volver">← Volver a propuestas</a>
+      <a href="{% url 'propuestas:propuesta_lista' %}" class="propuesta-volver enlace-icono">{% include "componentes/icono.html" with nombre="volver" %}Volver a propuestas</a>
       <p class="propuesta-periodo">{{ propuesta.periodo.nombre }}</p>
       <h1>{{ propuesta.asignatura.nombre }}</h1>
       <p class="propuesta-subtitulo">
@@ -52,7 +52,7 @@
       <h2 id="titulo-adherentes">Adherentes</h2>
       <p class="propuesta-adherentes__numero">{{ propuesta.total_adhesiones }} <span>estudiante{{ propuesta.total_adhesiones|pluralize }}</span></p>
       {% if propuesta.total_adhesiones > 0 %}
-        <a href="{% url 'propuestas:propuesta_adherentes' propuesta.pk %}" class="boton boton--secundario">Ver nombres y programas</a>
+        <a href="{% url 'propuestas:propuesta_adherentes' propuesta.pk %}" class="boton boton--secundario">{% include "componentes/icono.html" with nombre="usuarios" %}Ver nombres y programas</a>
       {% else %}
         <p class="texto-secundario">Aún no hay estudiantes adheridos.</p>
       {% endif %}
@@ -68,13 +68,13 @@
     </div>
     {% if ya_adherido and puede_retirar %}
       <form method="post" action="{% url 'propuestas:propuesta_retiro' propuesta.pk %}">
-        {% csrf_token %}<button type="submit" class="boton boton--peligro">Retirar adhesión</button>
+        {% csrf_token %}<button type="submit" class="boton boton--peligro">{% include "componentes/icono.html" with nombre="retirar" %}Retirar adhesión</button>
       </form>
     {% elif ya_adherido %}
       <p class="propuesta-nota">Ya estás adherido a esta propuesta.</p>
     {% elif puede_adherirse %}
       <form method="post" action="{% url 'propuestas:propuesta_adhesion' propuesta.pk %}">
-        {% csrf_token %}<button type="submit" class="boton boton--primario">Me interesa esta propuesta</button>
+        {% csrf_token %}<button type="submit" class="boton boton--primario">{% include "componentes/icono.html" with nombre="interes" %}Me interesa esta propuesta</button>
       </form>
     {% else %}
       <div class="propuesta-bloqueo">

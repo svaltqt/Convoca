@@ -3,15 +3,6 @@
 {% block titulo %}Reactivar docente — Convoca{% endblock %}
 
 {% block content %}
-  <header>
-    <h1>Reactivar docente</h1>
-  </header>
-
-  <p>¿Deseas reactivar el docente <strong>{{ object.nombre }}</strong>? Volverá a estar disponible para nuevas propuestas.</p>
-
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="boton boton--primario">Reactivar</button>
-    <a href="{% url 'academico:docente_lista' %}" class="boton boton--secundario">Cancelar</a>
-  </form>
+  {% url 'academico:docente_lista' as url_lista %}
+  {% include "componentes/confirmar_estado.html" with titulo="Reactivar docente" entidad="el docente" nombre_objeto=object.nombre consecuencia="Volverá a estar disponible para nuevas propuestas." url_cancelar=url_lista peligro=False texto_confirmar="Reactivar" %}
 {% endblock %}

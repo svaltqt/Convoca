@@ -29,19 +29,25 @@
     <div class="adherentes-resumen">
       <p><strong>{{ adhesiones|length }} adherente{{ adhesiones|length|pluralize }}</strong> en total.</p>
       <a href="{% url 'reportes:adherentes_por_propuesta_pdf' %}?propuesta={{ propuesta_seleccionada }}" class="boton boton--secundario" style="margin-top: var(--espacio-3);">
-        Exportar a PDF
+        {% include "componentes/icono.html" with nombre="descargar" %}Exportar a PDF
       </a>
     </div>
 
     {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj mensaje_vacio="No hay adherentes para esta propuesta." %}
   {% else %}
     <div class="tabla-listado">
-      <p class="tabla-listado__vacio">No hay adherentes para la propuesta seleccionada.</p>
+      <div class="tabla-listado__vacio">
+        {% include "componentes/icono.html" with nombre="bandeja" %}
+        <p>No hay adherentes para la propuesta seleccionada.</p>
+      </div>
     </div>
   {% endif %}
 {% else %}
   <div class="tabla-listado">
-    <p class="tabla-listado__vacio">Seleccione una propuesta para ver sus adherentes.</p>
+    <div class="tabla-listado__vacio">
+      {% include "componentes/icono.html" with nombre="bandeja" %}
+      <p>Seleccione una propuesta para ver sus adherentes.</p>
+    </div>
   </div>
 {% endif %}
 {% endblock %}

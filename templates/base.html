@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block titulo %}Convoca{% endblock %}</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,6 +28,7 @@
         <a href="/" class="marca">Convoca</a>
         {% if user.is_authenticated %}
           <div class="cabecera__usuario">
+            {% include "componentes/icono.html" with nombre="usuario" %}
             <span class="cabecera__usuario-nombre">
               {% if ocultar_email_usuario %}
                 {{ user.first_name|default:"Usuario" }}
@@ -35,7 +38,7 @@
             </span>
             <form method="post" action="{% url 'usuarios:salir' %}">
               {% csrf_token %}
-              <button type="submit" class="enlace-boton">Cerrar sesión</button>
+              <button type="submit" class="enlace-boton enlace-icono">{% include "componentes/icono.html" with nombre="salir" %}Cerrar sesión</button>
             </form>
           </div>
         {% else %}
@@ -52,22 +55,22 @@
       <div class="contenedor navegacion__interior">
         <ul class="navegacion__lista">
           {% if user.is_authenticated %}
-            <li><a href="{% url 'propuestas:propuesta_lista' %}">Propuestas</a></li>
+            <li><a href="{% url 'propuestas:propuesta_lista' %}">{% include "componentes/icono.html" with nombre="propuestas" %}Propuestas</a></li>
             {% if user.is_staff %}
               <li class="navegacion__item-con-submenu">
-                <a href="{% url 'reportes:index' %}" class="navegacion__enlace-con-submenu">Reportes</a>
+                <a href="{% url 'reportes:index' %}" class="navegacion__enlace-con-submenu">{% include "componentes/icono.html" with nombre="reportes" %}Reportes</a>
                 <ul class="navegacion__submenu">
                   <li><a href="{% url 'reportes:quorum_por_facultad' %}">Estado de quórum</a></li>
                   <li><a href="{% url 'reportes:adherentes_por_propuesta' %}">Adherentes por propuesta</a></li>
                 </ul>
               </li>
               <li class="navegacion__separador" aria-hidden="true"></li>
-              <li><a href="{% url 'academico:facultad_lista' %}">Facultades</a></li>
-              <li><a href="{% url 'academico:programa_lista' %}">Programas</a></li>
-              <li><a href="{% url 'academico:asignatura_lista' %}">Asignaturas</a></li>
-              <li><a href="{% url 'academico:docente_lista' %}">Docentes</a></li>
-              <li><a href="{% url 'periodos:periodo_lista' %}">Periodos</a></li>
-              <li><a href="#">Usuarios</a></li>
+              <li><a href="{% url 'academico:facultad_lista' %}">{% include "componentes/icono.html" with nombre="facultades" %}Facultades</a></li>
+              <li><a href="{% url 'academico:programa_lista' %}">{% include "componentes/icono.html" with nombre="programas" %}Programas</a></li>
+              <li><a href="{% url 'academico:asignatura_lista' %}">{% include "componentes/icono.html" with nombre="asignaturas" %}Asignaturas</a></li>
+              <li><a href="{% url 'academico:docente_lista' %}">{% include "componentes/icono.html" with nombre="docentes" %}Docentes</a></li>
+              <li><a href="{% url 'periodos:periodo_lista' %}">{% include "componentes/icono.html" with nombre="periodos" %}Periodos</a></li>
+              <li><a href="#">{% include "componentes/icono.html" with nombre="usuarios" %}Usuarios</a></li>
             {% endif %}
           {% endif %}
         </ul>
@@ -78,7 +81,18 @@
   {% if messages %}
     <div class="mensajes contenedor" role="status">
       {% for message in messages %}
-        <div class="alerta alerta--{{ message.tags|default:'info' }}">{{ message }}</div>
+        <div class="alerta alerta--{{ message.tags|default:'info' }}">
+          {% if message.tags == "success" %}
+            {% include "componentes/icono.html" with nombre="exito" %}
+          {% elif message.tags == "error" %}
+            {% include "componentes/icono.html" with nombre="error" %}
+          {% elif message.tags == "warning" %}
+            {% include "componentes/icono.html" with nombre="alerta" %}
+          {% else %}
+            {% include "componentes/icono.html" with nombre="info" %}
+          {% endif %}
+          <span>{{ message }}</span>
+        </div>
       {% endfor %}
     </div>
   {% endif %}
