@@ -26,7 +26,13 @@
         <a href="/" class="marca">Convoca</a>
         {% if user.is_authenticated %}
           <div class="cabecera__usuario">
-            <span class="cabecera__usuario-nombre">{{ user.first_name|default:user.email }}</span>
+            <span class="cabecera__usuario-nombre">
+              {% if ocultar_email_usuario %}
+                {{ user.first_name|default:"Usuario" }}
+              {% else %}
+                {{ user.first_name|default:user.email }}
+              {% endif %}
+            </span>
             <form method="post" action="{% url 'usuarios:salir' %}">
               {% csrf_token %}
               <button type="submit" class="enlace-boton">Cerrar sesión</button>
@@ -42,12 +48,11 @@
       </div>
     </div>
 
-    {# Los href="#" se reemplazan por {% url %} cuando cada app defina sus rutas. #}
     <nav class="navegacion" aria-label="Principal">
       <div class="contenedor navegacion__interior">
         <ul class="navegacion__lista">
           {% if user.is_authenticated %}
-            <li><a href="#">Propuestas</a></li>
+            <li><a href="{% url 'propuestas:propuesta_lista' %}">Propuestas</a></li>
             <li><a href="#">Reportes</a></li>
             {% if user.is_staff %}
               <li class="navegacion__separador" aria-hidden="true"></li>
@@ -55,7 +60,7 @@
               <li><a href="{% url 'academico:programa_lista' %}">Programas</a></li>
               <li><a href="{% url 'academico:asignatura_lista' %}">Asignaturas</a></li>
               <li><a href="{% url 'academico:docente_lista' %}">Docentes</a></li>
-              <li><a href="#">Periodos</a></li>
+              <li><a href="{% url 'periodos:periodo_lista' %}">Periodos</a></li>
               <li><a href="#">Usuarios</a></li>
             {% endif %}
           {% endif %}

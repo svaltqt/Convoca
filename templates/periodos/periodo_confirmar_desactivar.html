@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Desactivar periodo — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Desactivar periodo</h1>
+  </header>
+
+  <p>¿Deseas desactivar el periodo <strong>{{ object.nombre }}</strong>? No se podrán crear nuevas propuestas en este periodo, pero las propuestas existentes conservarán su referencia.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="boton boton--peligro">Desactivar</button>
+    <a href="{% url 'periodos:periodo_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}

@@ -17,6 +17,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "django-stubs>=6.1.1",
     "model-bakery>=1.24.0",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",

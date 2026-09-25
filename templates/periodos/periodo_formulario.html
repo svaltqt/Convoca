@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if object %}Editar periodo{% else %}Nuevo periodo{% endif %} — Convoca{% endblock %}
+
+{% block content %}
+  <header class="encabezado-listado">
+    <div>
+      <h1>{% if object %}Editar periodo{% else %}Nuevo periodo{% endif %}</h1>
+      <p class="texto-secundario">
+        {% if object %}
+          Estás editando el periodo «{{ object.nombre }}».
+        {% else %}
+          Crear un nuevo periodo académico.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{% url 'periodos:periodo_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </header>
+
+  <form method="post">
+    {% csrf_token %}
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">Guardar periodo</button>
+  </form>
+{% endblock %}

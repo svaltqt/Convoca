@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Adherentes de {{ propuesta }} — Convoca{% endblock %}
+
+{% block content %}
+  <header class="encabezado-listado">
+    <div>
+      <h1>Adherentes de la propuesta</h1>
+      <p class="texto-secundario">
+        {{ propuesta.asignatura.nombre }} - {{ propuesta.periodo.nombre }}
+      </p>
+    </div>
+    <a href="{% url 'propuestas:propuesta_detalle' propuesta.pk %}" class="boton boton--secundario">Volver a la propuesta</a>
+  </header>
+
+  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj mensaje_vacio="No hay adherentes registrados." %}
+{% endblock %}
