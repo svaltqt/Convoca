@@ -38,7 +38,10 @@ Contexto esperado (se arma en la vista, no aquí):
       </table>
     </div>
   {% else %}
-    <p class="tabla-listado__vacio">{{ mensaje_vacio|default:"No hay registros para mostrar." }}</p>
+    <div class="tabla-listado__vacio">
+      {% include "componentes/icono.html" with nombre="bandeja" %}
+      <p>{{ mensaje_vacio|default:"No hay registros para mostrar." }}</p>
+    </div>
   {% endif %}
 
   {% if page_obj and page_obj.paginator.num_pages > 1 %}

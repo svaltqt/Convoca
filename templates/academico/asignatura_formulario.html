@@ -7,7 +7,7 @@
     <h1>{% if object %}Editar asignatura{% else %}Nueva asignatura{% endif %}</h1>
   </header>
 
-  <form method="post" novalidate>
+  <form method="post" novalidate class="formulario-panel">
     {% csrf_token %}
     {% include "componentes/formulario.html" with form=form %}
     <button type="submit" class="boton boton--primario">Guardar</button>

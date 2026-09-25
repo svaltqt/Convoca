@@ -8,7 +8,7 @@
       <h1>Programas</h1>
       <p class="texto-secundario">Crea, modifica y desactiva los programas académicos, agrupados por facultad.</p>
     </div>
-    <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear }}</a>
+    <a href="{{ url_crear }}" class="boton boton--primario">{% include "componentes/icono.html" with nombre="agregar" %}{{ texto_crear }}</a>
   </header>
 
   {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado etiqueta_activas="Activos" etiqueta_inactivas="Inactivos" %}

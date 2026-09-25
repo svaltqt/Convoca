@@ -3,6 +3,58 @@
 {% block titulo %}Convoca — Inicio{% endblock %}
 
 {% block content %}
-  <h1>Bienvenido a Convoca</h1>
-  <p>Aquí vas a poder proponer cursos vacacionales y apoyar las propuestas de otros estudiantes hasta reunir el quórum mínimo.</p>
+  <section class="inicio-hero">
+    {% if user.is_authenticated %}
+      <h1>Hola, {{ user.first_name|default:"estudiante" }}</h1>
+      <p>Propón cursos vacacionales y apoya las propuestas de otros estudiantes hasta reunir el quórum mínimo. Recuerda: aquí registras tu intención de matrícula; la inscripción oficial se hace por Universitas XXI.</p>
+      <div class="inicio-acciones">
+        <a href="{% url 'propuestas:propuesta_lista' %}" class="boton boton--primario">{% include "componentes/icono.html" with nombre="propuestas" %}Ver propuestas</a>
+      </div>
+    {% else %}
+      <h1>Bienvenido a Convoca</h1>
+      <p>La plataforma donde los estudiantes del Politécnico proponen cursos vacacionales y reúnen el quórum mínimo para que se abran. Aquí registras tu intención de matrícula; la inscripción oficial se hace por Universitas XXI.</p>
+      <div class="inicio-acciones">
+        <a href="{% url 'usuarios:registro' %}" class="boton boton--primario">Crear cuenta</a>
+        <a href="{% url 'usuarios:entrar' %}" class="boton boton--secundario">Iniciar sesión</a>
+      </div>
+    {% endif %}
+  </section>
+
+  {% if user.is_staff %}
+    <section class="inicio-seccion" aria-labelledby="titulo-modulos">
+      <h2 id="titulo-modulos">Administración</h2>
+      <div class="inicio-modulos">
+        <a href="{% url 'academico:facultad_lista' %}" class="tarjeta-modulo">
+          {% include "componentes/icono.html" with nombre="facultades" %}
+          <strong>Facultades</strong>
+          <span>Gestiona las facultades de la institución.</span>
+        </a>
+        <a href="{% url 'academico:programa_lista' %}" class="tarjeta-modulo">
+          {% include "componentes/icono.html" with nombre="programas" %}
+          <strong>Programas</strong>
+          <span>Programas académicos por facultad.</span>
+        </a>
+        <a href="{% url 'academico:asignatura_lista' %}" class="tarjeta-modulo">
+          {% include "componentes/icono.html" with nombre="asignaturas" %}
+          <strong>Asignaturas</strong>
+          <span>Asignaturas ofrecidas por cada programa.</span>
+        </a>
+        <a href="{% url 'academico:docente_lista' %}" class="tarjeta-modulo">
+          {% include "componentes/icono.html" with nombre="docentes" %}
+          <strong>Docentes</strong>
+          <span>Docentes disponibles para sugerir en propuestas.</span>
+        </a>
+        <a href="{% url 'periodos:periodo_lista' %}" class="tarjeta-modulo">
+          {% include "componentes/icono.html" with nombre="periodos" %}
+          <strong>Periodos</strong>
+          <span>Periodos vacacionales y sus cupos mínimos.</span>
+        </a>
+        <a href="{% url 'reportes:index' %}" class="tarjeta-modulo">
+          {% include "componentes/icono.html" with nombre="reportes" %}
+          <strong>Reportes</strong>
+          <span>Estado de quórum y adherentes por propuesta.</span>
+        </a>
+      </div>
+    </section>
+  {% endif %}
 {% endblock %}

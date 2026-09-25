@@ -3,16 +3,20 @@
 {% block titulo %}Crear cuenta — Convoca{% endblock %}
 
 {% block content %}
-  <header>
-    <h1>Crear cuenta</h1>
-    <p class="texto-secundario">Usa tu correo institucional para proponer cursos vacacionales y apoyar propuestas de otros estudiantes.</p>
-  </header>
+  <div class="autenticacion">
+    <div class="autenticacion__tarjeta">
+      <header>
+        <h1>Crear cuenta</h1>
+        <p class="texto-secundario">Usa tu correo institucional para proponer cursos vacacionales y apoyar propuestas de otros estudiantes.</p>
+      </header>
 
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {% include "componentes/formulario.html" with form=form %}
-    <button type="submit" class="boton boton--primario">Crear cuenta</button>
-  </form>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "componentes/formulario.html" with form=form %}
+        <button type="submit" class="boton boton--primario">Crear cuenta</button>
+      </form>
+    </div>
 
-  <p class="texto-secundario">¿Ya tienes cuenta? <a href="{% url 'usuarios:entrar' %}">Inicia sesión</a>.</p>
+    <p class="autenticacion__alternativa texto-secundario">¿Ya tienes cuenta? <a href="{% url 'usuarios:entrar' %}">Inicia sesión</a>.</p>
+  </div>
 {% endblock %}

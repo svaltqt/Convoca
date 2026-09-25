@@ -17,7 +17,7 @@
     <a href="{% url 'propuestas:propuesta_lista' %}" class="boton boton--secundario">Cancelar</a>
   </header>
 
-  <form method="post">
+  <form method="post" class="formulario-panel">
     {% csrf_token %}
     {% include "componentes/formulario.html" with form=form %}
     <button type="submit" class="boton boton--primario">Guardar propuesta</button>

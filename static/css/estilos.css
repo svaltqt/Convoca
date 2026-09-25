@@ -333,6 +333,7 @@ body {
 .navegacion__lista a {
   display: inline-flex;
   align-items: center;
+  gap: 0.4em;
   height: 100%;
   padding: var(--espacio-3) var(--espacio-2);
   color: var(--poli-verde-oscuro);
@@ -340,6 +341,17 @@ body {
   font-size: 0.9375rem;
   text-decoration: none;
   border-bottom: 3px solid transparent;
+}
+
+.navegacion__lista .icono {
+  width: 1.05em;
+  height: 1.05em;
+  opacity: 0.75;
+}
+
+.navegacion__lista a[aria-current="page"] .icono,
+.navegacion__lista a:hover .icono {
+  opacity: 1;
 }
 
 .navegacion__lista a:hover {
@@ -485,11 +497,23 @@ body {
 }
 
 .alerta {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-3);
   border: 1px solid;
   border-left-width: 4px;
   border-radius: var(--radio);
   padding: var(--espacio-3) var(--espacio-4);
   font-size: 0.9375rem;
+}
+
+.alerta .icono {
+  margin-top: 0.15em;
+  flex-shrink: 0;
+}
+
+.alerta p {
+  margin: 0;
 }
 
 .alerta--success {
@@ -620,12 +644,21 @@ body {
 }
 
 .formulario__error-general {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-3);
   border: 1px solid var(--color-error);
   border-left-width: 4px;
   background: var(--color-error-fondo);
   border-radius: var(--radio);
   padding: var(--espacio-3) var(--espacio-4);
   margin-bottom: var(--espacio-4);
+}
+
+.icono--error-resumen {
+  color: var(--color-error);
+  margin-top: 0.15em;
+  flex-shrink: 0;
 }
 
 .formulario__error-general p {
@@ -761,11 +794,25 @@ input[type="radio"] {
 }
 
 .tabla-listado__vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-3);
   border: 1px dashed var(--color-borde-fuerte);
   border-radius: var(--radio);
   padding: var(--espacio-8);
   text-align: center;
   color: var(--color-texto-secundario);
+}
+
+.tabla-listado__vacio .icono {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-borde-fuerte);
+}
+
+.tabla-listado__vacio p {
+  margin: 0;
 }
 
 .paginacion {
@@ -818,38 +865,56 @@ input[type="radio"] {
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.45em;
   font-size: 0.8125rem;
   font-weight: 700;
   padding: var(--espacio-1) var(--espacio-3);
   border-radius: var(--radio);
-  border-left: 4px solid var(--color-borde-fuerte);
+  border-left: 4px solid var(--badge-borde, var(--color-borde-fuerte));
   background: var(--color-fondo-sutil);
   color: var(--color-texto);
   white-space: nowrap;
 }
 
+/* Punto de estado: refuerzo redundante al color de fondo (WCAG 1.4.1).
+   Usa el derivado oscuro de cada color para que se perciba sobre el
+   fondo tenue del badge; el borde izquierdo sí lleva el color de marca. */
+.badge::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: var(--badge-acento, var(--color-borde-fuerte));
+  flex-shrink: 0;
+}
+
 .badge--abierta {
-  border-left-color: var(--poli-teal);
+  --badge-borde: var(--poli-teal);
+  --badge-acento: var(--poli-teal-oscuro);
   background: var(--color-info-fondo);
 }
 
 .badge--quorum {
-  border-left-color: var(--poli-amarillo);
+  --badge-borde: var(--poli-amarillo);
+  --badge-acento: #ad8200;
   background: #fff8db;
 }
 
 .badge--radicada {
-  border-left-color: var(--poli-naranja);
+  --badge-borde: var(--poli-naranja);
+  --badge-acento: #b85c00;
   background: #fef0e0;
 }
 
 .badge--aprobada {
-  border-left-color: var(--poli-verde-oscuro);
+  --badge-borde: var(--poli-verde);
+  --badge-acento: var(--poli-verde-oscuro);
   background: var(--color-exito-fondo);
 }
 
 .badge--rechazada {
-  border-left-color: var(--color-error);
+  --badge-borde: var(--color-error);
+  --badge-acento: var(--color-error);
   background: var(--color-error-fondo);
 }
 
@@ -1127,4 +1192,277 @@ input[type="radio"] {
 .adherentes-resumen p {
   margin: 0;
   font-size: 1rem;
+}
+
+.reporte-opcion {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-4);
+}
+
+.reporte-opcion .icono {
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: 0.15rem;
+  color: var(--poli-verde-oscuro);
+  flex-shrink: 0;
+}
+
+.reporte-opcion h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+/* ---------- 16. Iconos ---------- */
+/*
+  Los iconos son SVG en línea (componentes/icono.html), de trazo, y heredan
+  currentColor: toman el color del texto del botón o enlace que los contiene.
+  Son decorativos (aria-hidden); el nombre accesible lo da el texto visible.
+*/
+
+.icono {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  flex-shrink: 0;
+  vertical-align: -0.18em;
+}
+
+.boton .icono {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+/* ---------- 17. Acciones de fila en tablas ---------- */
+/*
+  Los enlaces de acción de las maestras (Editar / Desactivar / Reactivar)
+  llevan un icono dibujado con máscara CSS, para no cargar markup SVG en
+  las cadenas HTML que arma la vista. El color de la máscara es
+  currentColor, así que acompaña al color del enlace.
+*/
+
+.tabla-acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  flex-wrap: wrap;
+}
+
+.accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.accion:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.accion::before {
+  content: "";
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask: var(--accion-icono) no-repeat center / contain;
+  mask: var(--accion-icono) no-repeat center / contain;
+}
+
+.accion--editar {
+  --accion-icono: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20h4L18.5 9.5a2.12 2.12 0 0 0-3-3L5 17v3z'/><path d='m13.5 6.5 3 3'/></svg>");
+}
+
+.accion--desactivar {
+  --accion-icono: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='m5.7 5.7 12.6 12.6'/></svg>");
+}
+
+.accion--reactivar {
+  --accion-icono: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 12a9 9 0 1 1-2.64-6.36'/><path d='M21 3v6h-6'/></svg>");
+}
+
+/* ---------- 18. Autenticación (entrar / registro) ---------- */
+
+.autenticacion {
+  max-width: 28rem;
+  margin: var(--espacio-6) auto 0;
+}
+
+.autenticacion__tarjeta {
+  border: 1px solid var(--color-borde);
+  border-top: 4px solid var(--poli-verde-oscuro);
+  border-radius: var(--radio);
+  background: var(--color-fondo);
+  padding: var(--espacio-6);
+}
+
+.autenticacion__tarjeta h1 {
+  font-size: 1.5rem;
+  margin-bottom: var(--espacio-2);
+}
+
+.autenticacion__tarjeta header p {
+  margin-bottom: var(--espacio-6);
+}
+
+.autenticacion__tarjeta .campo {
+  max-width: none;
+}
+
+.autenticacion__tarjeta .boton--primario {
+  width: 100%;
+}
+
+.autenticacion__alternativa {
+  margin-top: var(--espacio-4);
+  text-align: center;
+}
+
+/* ---------- 19. Inicio ---------- */
+/*
+  El bloque de bienvenida repite el patrón de acento del detalle de
+  propuesta (borde izquierdo grueso sobre fondo sutil): es el motivo
+  visual propio del sistema, no una tarjeta genérica con sombra.
+*/
+
+.inicio-hero {
+  border-left: 5px solid var(--poli-verde-oscuro);
+  background: var(--color-fondo-sutil);
+  padding: var(--espacio-6) var(--espacio-8);
+  margin-bottom: var(--espacio-8);
+}
+
+.inicio-hero h1 {
+  margin-bottom: var(--espacio-2);
+}
+
+.inicio-hero p {
+  margin-bottom: var(--espacio-4);
+}
+
+.inicio-acciones {
+  display: flex;
+  gap: var(--espacio-3);
+  flex-wrap: wrap;
+}
+
+.inicio-seccion h2 {
+  font-size: 1.125rem;
+  color: var(--poli-verde-oscuro);
+  margin-bottom: var(--espacio-4);
+}
+
+.inicio-modulos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--espacio-4);
+}
+
+.tarjeta-modulo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: var(--espacio-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.tarjeta-modulo:hover {
+  border-color: var(--poli-verde-oscuro);
+}
+
+.tarjeta-modulo .icono {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--poli-verde-oscuro);
+}
+
+.tarjeta-modulo strong {
+  font-family: var(--fuente-titulos);
+  font-size: 1rem;
+}
+
+.tarjeta-modulo span {
+  font-size: 0.8125rem;
+  color: var(--color-texto-secundario);
+}
+
+/* ---------- 20. Panel de formulario ---------- */
+/*
+  Los formularios de las maestras van dentro de un panel delimitado, para
+  separar la zona de edición del resto de la página.
+*/
+
+.formulario-panel {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-fondo);
+  padding: var(--espacio-6);
+  max-width: 40rem;
+}
+
+.formulario-panel .boton + .boton {
+  margin-left: var(--espacio-2);
+}
+
+/* ---------- 21. Confirmaciones (activar / desactivar) ---------- */
+
+.confirmacion {
+  max-width: 36rem;
+  border: 1px solid var(--color-borde);
+  border-left: 5px solid var(--poli-verde-oscuro);
+  border-radius: var(--radio);
+  background: var(--color-fondo);
+  padding: var(--espacio-6);
+}
+
+.confirmacion--peligro {
+  border-left-color: var(--color-error);
+}
+
+.confirmacion h1 {
+  font-size: 1.375rem;
+  margin-bottom: var(--espacio-3);
+}
+
+.confirmacion form {
+  display: flex;
+  gap: var(--espacio-3);
+  flex-wrap: wrap;
+  margin-top: var(--espacio-4);
+}
+
+/* ---------- 22. Utilidades de enlaces con icono ---------- */
+
+.enlace-icono {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+/* ---------- 23. Ajustes responsive del rediseño ---------- */
+
+@media (max-width: 720px) {
+  .inicio-hero {
+    padding: var(--espacio-4) var(--espacio-6);
+  }
+
+  .autenticacion {
+    margin-top: 0;
+  }
+
+  .autenticacion__tarjeta,
+  .formulario-panel,
+  .confirmacion {
+    padding: var(--espacio-4);
+  }
+
+  .reporte-opciones {
+    grid-template-columns: 1fr;
+  }
 }

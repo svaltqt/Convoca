@@ -11,7 +11,7 @@
     </p>
   </div>
   <a href="{% url 'reportes:quorum_por_facultad_pdf' %}" class="boton boton--secundario">
-    Exportar a PDF
+    {% include "componentes/icono.html" with nombre="descargar" %}Exportar a PDF
   </a>
 </header>
 
@@ -79,7 +79,10 @@
   {% endfor %}
 {% else %}
   <div class="tabla-listado">
-    <p class="tabla-listado__vacio">No hay propuestas activas en periodos abiertos para mostrar.</p>
+    <div class="tabla-listado__vacio">
+      {% include "componentes/icono.html" with nombre="bandeja" %}
+      <p>No hay propuestas activas en periodos abiertos para mostrar.</p>
+    </div>
   </div>
 {% endif %}
 {% endblock %}

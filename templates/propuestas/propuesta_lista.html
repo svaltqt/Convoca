@@ -9,7 +9,7 @@
       <p class="texto-secundario">Consulta las propuestas de cursos vacacionales y su estado de adhesión.</p>
     </div>
     {% if not user.is_staff %}
-      <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear }}</a>
+      <a href="{{ url_crear }}" class="boton boton--primario">{% include "componentes/icono.html" with nombre="agregar" %}{{ texto_crear }}</a>
     {% endif %}
   </header>
 
