@@ -566,6 +566,39 @@ def test_propuestas_radicada_o_posterior_no_aceptan_adhesiones(client):
 
 
 @pytest.mark.django_db
+def test_estudiante_puede_adherirse_a_propuesta_en_estado_quorum(client):
+    """Test que verifica que un estudiante puede adherirse a una propuesta en estado QUORUM"""
+    programa = baker.make(Programa, activo=True)
+    periodo = baker.make(Periodo, abierto=True, cupo_minimo=1)
+    asignatura = baker.make(Asignatura, programa=programa, activa=True)
+    creador = crear_estudiante()
+
+    propuesta = Propuesta.objects.create(
+        asignatura=asignatura,
+        periodo=periodo,
+        creador=creador,
+    )
+    propuesta.refresh_from_db()
+    assert propuesta.estado == Propuesta.Estado.QUORUM
+
+    usuario = crear_estudiante()
+    client.force_login(usuario)
+
+    respuesta_detalle = client.get(
+        reverse("propuestas:propuesta_detalle", args=[propuesta.pk])
+    )
+    contenido = respuesta_detalle.content.decode()
+    assert "Me interesa esta propuesta" in contenido
+    assert "La propuesta ya no está abierta" not in contenido
+
+    respuesta_adhesion = client.post(
+        reverse("propuestas:propuesta_adhesion", args=[propuesta.pk])
+    )
+    assert respuesta_adhesion.status_code == 302
+    assert Adhesion.objects.filter(propuesta=propuesta, usuario=usuario).exists()
+
+
+@pytest.mark.django_db
 def test_administrador_puede_cambiar_estado_permitido(client):
     """Test que verifica que administrador puede cambiar estado con transiciones permitidas"""
     # Esta prueba debe fallar porque no existe la vista de cambio de estado

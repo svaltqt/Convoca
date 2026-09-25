@@ -115,7 +115,7 @@ class PropuestaDetalleView(LoginRequiredMixin, DetailView):
             propuesta.periodo.abierto and
             propuesta.periodo.fecha_cierre_propuestas >= timezone.now().date() and
             usuario.autorizo_datos and
-            propuesta.estado == Propuesta.Estado.ABIERTA
+            propuesta.estado in [Propuesta.Estado.ABIERTA, Propuesta.Estado.QUORUM]
         )
 
         # Verificar si el usuario puede retirar su adhesión
