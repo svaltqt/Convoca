@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block titulo %}Estado de quórum por facultad - Convoca{% endblock %}
+
+{% block content %}
+<header class="encabezado-listado">
+  <div>
+    <h1>Estado de quórum por facultad</h1>
+    <p class="texto-secundario">
+      Propuestas activas agrupadas por facultad. Se muestran interesados, avance frente al cupo mínimo y días restantes.
+    </p>
+  </div>
+  <a href="{% url 'reportes:quorum_por_facultad_pdf' %}" class="boton boton--secundario">
+    Exportar a PDF
+  </a>
+</header>
+
+{% if facultades_con_datos %}
+  {% for fac in facultades_con_datos %}
+    <section class="reporte-facultad">
+      <header class="reporte-facultad__cabecera">
+        <h2>{{ fac.facultad.nombre }}</h2>
+        <div class="reporte-facultad__resumen">
+          <span class="reporte-facultad__total">Total interesados: <strong>{{ fac.total_interesados }}</strong></span>
+          <span class="reporte-facultad__cupo">Cupo mínimo total: <strong>{{ fac.total_cupo_minimo }}</strong></span>
+          <span class="reporte-facultad__porcentaje">Avance: <strong>{{ fac.porcentaje }}%</strong></span>
+        </div>
+      </header>
+
+      <div class="tabla-listado">
+        <div class="tabla-listado__scroll">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th scope="col">Asignatura</th>
+                <th scope="col">Programa</th>
+                <th scope="col">Periodo</th>
+                <th scope="col">Interesados</th>
+                <th scope="col">Cupo mínimo</th>
+                <th scope="col">Avance</th>
+                <th scope="col">Días restantes</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for prop in fac.propuestas %}
+                <tr>
+                  <td>{{ prop.asignatura.nombre }}</td>
+                  <td>{{ prop.programa.nombre }}</td>
+                  <td>{{ prop.periodo.nombre }}</td>
+                  <td>{{ prop.total_interesados }}</td>
+                  <td>{{ prop.cupo_minimo }}</td>
+                  <td>
+                    {% widthratio prop.total_interesados prop.cupo_minimo 100 as porcentaje %}
+                    <div class="quorum">
+                      <div class="quorum__pista">
+                        <div class="quorum__relleno" style="width: {% if porcentaje > 100 %}100{% else %}{{ porcentaje }}{% endif %}%;"></div>
+                      </div>
+                      <p class="quorum__texto">{{ prop.total_interesados }} de {{ prop.cupo_minimo }} interesados</p>
+                    </div>
+                  </td>
+                  <td>
+                    {% if prop.dias_restantes == 0 %}
+                      <span class="texto-secundario">Finalizado</span>
+                    {% elif prop.dias_restantes <= 7 %}
+                      <strong style="color: var(--color-error);">{{ prop.dias_restantes }} días</strong>
+                    {% else %}
+                      {{ prop.dias_restantes }} días
+                    {% endif %}
+                  </td>
+                  <td>{% include "componentes/badge_estado.html" with estado=prop.estado estado_display=prop.estado_display %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  {% endfor %}
+{% else %}
+  <div class="tabla-listado">
+    <p class="tabla-listado__vacio">No hay propuestas activas en periodos abiertos para mostrar.</p>
+  </div>
+{% endif %}
+{% endblock %}

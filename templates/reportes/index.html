@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block titulo %}Reportes - Convoca{% endblock %}
+
+{% block content %}
+<header class="encabezado-listado">
+  <div>
+    <h1>Reportes administrativos</h1>
+    <p class="texto-secundario">Consulte el estado de quórum y listados de adherentes.</p>
+  </div>
+</header>
+
+<div class="reporte-opciones">
+  <a href="{% url 'reportes:quorum_por_facultad' %}" class="reporte-opcion">
+    <h2>Estado de quórum por facultad</h2>
+    <p>Visualice las propuestas agrupadas por facultad con cantidad de interesados, porcentaje de avance y días restantes del periodo.</p>
+  </a>
+
+  <a href="{% url 'reportes:adherentes_por_propuesta' %}" class="reporte-opcion">
+    <h2>Adherentes por propuesta</h2>
+    <p>Seleccione una propuesta para ver el listado de adherentes con nombre y programa, y exportar a PDF.</p>
+  </a>
+</div>
+{% endblock %}

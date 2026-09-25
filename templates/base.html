@@ -53,8 +53,14 @@
         <ul class="navegacion__lista">
           {% if user.is_authenticated %}
             <li><a href="{% url 'propuestas:propuesta_lista' %}">Propuestas</a></li>
-            <li><a href="#">Reportes</a></li>
             {% if user.is_staff %}
+              <li class="navegacion__item-con-submenu">
+                <a href="{% url 'reportes:index' %}" class="navegacion__enlace-con-submenu">Reportes</a>
+                <ul class="navegacion__submenu">
+                  <li><a href="{% url 'reportes:quorum_por_facultad' %}">Estado de quórum</a></li>
+                  <li><a href="{% url 'reportes:adherentes_por_propuesta' %}">Adherentes por propuesta</a></li>
+                </ul>
+              </li>
               <li class="navegacion__separador" aria-hidden="true"></li>
               <li><a href="{% url 'academico:facultad_lista' %}">Facultades</a></li>
               <li><a href="{% url 'academico:programa_lista' %}">Programas</a></li>
