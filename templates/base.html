@@ -70,7 +70,7 @@
               <li><a href="{% url 'academico:asignatura_lista' %}">{% include "componentes/icono.html" with nombre="asignaturas" %}Asignaturas</a></li>
               <li><a href="{% url 'academico:docente_lista' %}">{% include "componentes/icono.html" with nombre="docentes" %}Docentes</a></li>
               <li><a href="{% url 'periodos:periodo_lista' %}">{% include "componentes/icono.html" with nombre="periodos" %}Periodos</a></li>
-              <li><a href="#">{% include "componentes/icono.html" with nombre="usuarios" %}Usuarios</a></li>
+              <li><a href="{% url 'usuarios:usuario_lista' %}">{% include "componentes/icono.html" with nombre="usuarios" %}Usuarios</a></li>
             {% endif %}
           {% endif %}
         </ul>
