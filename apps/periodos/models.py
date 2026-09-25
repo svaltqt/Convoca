@@ -13,5 +13,5 @@ class Periodo(models.Model):
         verbose_name = "periodo"
         verbose_name_plural = "periodos"
 
-    def __str__(self):
-        return self.nombre
+    def __str__(self) -> str:
+        return str(self.nombre)

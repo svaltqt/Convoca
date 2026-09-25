@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Reactivar periodo — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Reactivar periodo</h1>
+  </header>
+
+  <p>¿Deseas reactivar el periodo <strong>{{ object.nombre }}</strong>? Volverá a estar disponible para crear nuevas propuestas.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="boton boton--primario">Reactivar</button>
+    <a href="{% url 'periodos:periodo_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}

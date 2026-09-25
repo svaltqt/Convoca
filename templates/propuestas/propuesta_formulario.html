@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if object %}Editar propuesta{% else %}Nueva propuesta{% endif %} — Convoca{% endblock %}
+
+{% block content %}
+  <header class="encabezado-listado">
+    <div>
+      <h1>{% if object %}Editar propuesta{% else %}Nueva propuesta{% endif %}</h1>
+      <p class="texto-secundario">
+        {% if object %}
+          Estás editando la propuesta «{{ object.asignatura }} - {{ object.periodo }}».
+        {% else %}
+          Crear una nueva propuesta de curso vacacional.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{% url 'propuestas:propuesta_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </header>
+
+  <form method="post">
+    {% csrf_token %}
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">Guardar propuesta</button>
+  </form>
+{% endblock %}

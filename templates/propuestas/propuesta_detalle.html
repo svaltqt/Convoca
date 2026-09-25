@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ propuesta.asignatura.nombre }} — Convoca{% endblock %}
+
+{% block content %}
+  <header class="propuesta-encabezado">
+    <div class="propuesta-encabezado__texto">
+      <a href="{% url 'propuestas:propuesta_lista' %}" class="propuesta-volver">← Volver a propuestas</a>
+      <p class="propuesta-periodo">{{ propuesta.periodo.nombre }}</p>
+      <h1>{{ propuesta.asignatura.nombre }}</h1>
+      <p class="propuesta-subtitulo">
+        Propuesta de {{ propuesta.creador.get_full_name|default:"Estudiante" }}
+        {% if propuesta.docente %}<span aria-hidden="true"> · </span>Docente sugerido: {{ propuesta.docente.nombre }}{% endif %}
+      </p>
+    </div>
+    <span class="badge badge--{{ propuesta.estado|lower }}">{{ propuesta.get_estado_display }}</span>
+  </header>
+
+  <section class="propuesta-quorum" aria-labelledby="titulo-quorum">
+    <div class="propuesta-quorum__encabezado">
+      <div>
+        <p class="propuesta-etiqueta">Interés estudiantil</p>
+        <h2 id="titulo-quorum">Avance hacia el quórum</h2>
+      </div>
+      <p class="propuesta-quorum__cifra"><strong>{{ propuesta.total_adhesiones }}</strong><span> / {{ propuesta.periodo.cupo_minimo }}</span></p>
+    </div>
+    <div class="quorum__pista" role="progressbar" aria-label="Avance hacia el quórum" aria-valuemin="0" aria-valuemax="{{ propuesta.periodo.cupo_minimo }}" aria-valuenow="{{ propuesta.total_adhesiones }}">
+      <div class="quorum__relleno" style="width: {{ porcentaje_quorum }}%"></div>
+    </div>
+    {% if propuesta.estado == "QUORUM" or propuesta.total_adhesiones >= propuesta.periodo.cupo_minimo %}
+      <p class="quorum__texto quorum__lograda">Quórum alcanzado. La propuesta puede continuar su proceso.</p>
+    {% else %}
+      <p class="quorum__texto">Faltan <strong>{{ faltan_para_quorum }}</strong> adhesiones para alcanzar el mínimo.</p>
+    {% endif %}
+  </section>
+
+  <div class="propuesta-detalle-grid">
+    <section class="propuesta-panel" aria-labelledby="titulo-datos-propuesta">
+      <p class="propuesta-etiqueta">Información</p>
+      <h2 id="titulo-datos-propuesta">Sobre la propuesta</h2>
+      <dl class="propuesta-datos">
+        <div><dt>Asignatura</dt><dd>{{ propuesta.asignatura.nombre }} <span>({{ propuesta.asignatura.codigo }})</span></dd></div>
+        <div><dt>Periodo</dt><dd>{{ propuesta.periodo.nombre }}</dd></div>
+        <div><dt>Creada</dt><dd>{{ propuesta.creada|date:"d/m/Y H:i" }}</dd></div>
+        <div><dt>Propuesta por</dt><dd>{{ propuesta.creador.get_full_name|default:"Estudiante" }}</dd></div>
+        {% if propuesta.docente %}<div><dt>Docente sugerido</dt><dd>{{ propuesta.docente.nombre }}</dd></div>{% endif %}
+      </dl>
+    </section>
+
+    <section class="propuesta-panel propuesta-panel--adherentes" aria-labelledby="titulo-adherentes">
+      <p class="propuesta-etiqueta">Comunidad</p>
+      <h2 id="titulo-adherentes">Adherentes</h2>
+      <p class="propuesta-adherentes__numero">{{ propuesta.total_adhesiones }} <span>estudiante{{ propuesta.total_adhesiones|pluralize }}</span></p>
+      {% if propuesta.total_adhesiones > 0 %}
+        <a href="{% url 'propuestas:propuesta_adherentes' propuesta.pk %}" class="boton boton--secundario">Ver nombres y programas</a>
+      {% else %}
+        <p class="texto-secundario">Aún no hay estudiantes adheridos.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  {% if not user.is_staff %}
+  <section class="propuesta-accion" aria-labelledby="titulo-participacion">
+    <div>
+      <p class="propuesta-etiqueta">Tu participación</p>
+      <h2 id="titulo-participacion">¿Te interesa cursar esta asignatura?</h2>
+      <p class="texto-secundario">Tu adhesión cuenta para alcanzar el quórum del periodo.</p>
+    </div>
+    {% if ya_adherido and puede_retirar %}
+      <form method="post" action="{% url 'propuestas:propuesta_retiro' propuesta.pk %}">
+        {% csrf_token %}<button type="submit" class="boton boton--peligro">Retirar adhesión</button>
+      </form>
+    {% elif ya_adherido %}
+      <p class="propuesta-nota">Ya estás adherido a esta propuesta.</p>
+    {% elif puede_adherirse %}
+      <form method="post" action="{% url 'propuestas:propuesta_adhesion' propuesta.pk %}">
+        {% csrf_token %}<button type="submit" class="boton boton--primario">Me interesa esta propuesta</button>
+      </form>
+    {% else %}
+      <div class="propuesta-bloqueo">
+        <p>No puedes adherirte en este momento.</p>
+        {% if not propuesta.periodo.abierto %}<p>El periodo está cerrado.</p>{% endif %}
+        {% if fecha_vencida %}<p>Ha pasado la fecha límite para presentar propuestas.</p>{% endif %}
+        {% if not user.autorizo_datos %}<p>No has autorizado el tratamiento de tus datos personales.</p>{% endif %}
+        {% if propuesta.estado != "ABIERTA" %}<p>La propuesta ya no está abierta para recibir adhesiones.</p>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% if user.is_staff %}
+  <section class="propuesta-accion propuesta-accion--admin" aria-labelledby="titulo-admin">
+    <div>
+      <p class="propuesta-etiqueta">Administración</p>
+      <h2 id="titulo-admin">Gestión del estado</h2>
+      {% if propuesta.estado == "ABIERTA" %}
+        <p class="texto-secundario">Al alcanzar el cupo mínimo, el sistema actualizará la propuesta a Quórum automáticamente.</p>
+      {% elif propuesta.estado == "QUORUM" %}
+        <p class="texto-secundario">El siguiente paso disponible es radicar la propuesta.</p>
+      {% elif propuesta.estado == "RADICADA" %}
+        <p class="texto-secundario">Revisa la propuesta y registra la decisión correspondiente.</p>
+      {% else %}
+        <p class="texto-secundario">Esta propuesta ya llegó a un estado final.</p>
+      {% endif %}
+    </div>
+    {% if propuesta.estado == "QUORUM" or propuesta.estado == "RADICADA" %}
+      <form method="post" action="{% url 'propuestas:propuesta_estado' propuesta.pk %}" class="propuesta-form-estado">
+        {% csrf_token %}
+        <div class="campo">
+          <label class="campo__etiqueta" for="id_estado">Cambiar estado a:</label>
+          <select name="estado" id="id_estado" required>
+            {% if propuesta.estado == "QUORUM" %}<option value="RADICADA">Radicada</option>{% endif %}
+            {% if propuesta.estado == "RADICADA" %}<option value="APROBADA">Aprobada</option><option value="RECHAZADA">Rechazada</option>{% endif %}
+          </select>
+        </div>
+        <button type="submit" class="boton boton--primario">Guardar estado</button>
+      </form>
+    {% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

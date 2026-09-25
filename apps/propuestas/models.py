@@ -1,5 +1,11 @@
 from django.conf import settings
-from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import models, transaction
+from django.utils import timezone
+
+
+class TransicionInvalidaError(Exception):
+    """La propuesta no puede realizar la transición de estado solicitada."""
 
 
 class Propuesta(models.Model):
@@ -58,6 +64,55 @@ class Propuesta(models.Model):
     def __str__(self):
         return f"{self.asignatura} - {self.periodo}"
 
+    @property
+    def total_adhesiones(self):
+        """Retorna el total de adhesiones a esta propuesta."""
+        return self.adhesiones.count()
+
+    def clean(self):
+        """Validaciones del modelo"""
+        # Validar que la asignatura esté activa
+        if self.asignatura and not self.asignatura.activa:
+            raise ValidationError(
+                {"asignatura": "No se puede crear una propuesta con una asignatura inactiva."}
+            )
+
+        if self.periodo and not self.periodo.abierto:
+            raise ValidationError(
+                {"periodo": "No se puede crear una propuesta en un periodo cerrado."}
+            )
+
+        if self.periodo and self.periodo.fecha_cierre_propuestas < timezone.localdate():
+            raise ValidationError(
+                {"periodo": "No se puede crear una propuesta después de la fecha de cierre de propuestas."}
+            )
+
+    def save(self, *args, **kwargs):
+        nueva = self._state.adding
+        self.full_clean(validate_constraints=False)
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if nueva and self.estado == Propuesta.Estado.ABIERTA:
+                Adhesion.objects.create(propuesta=self, usuario=self.creador)
+
+    def cambiar_estado(self, nuevo_estado, *, automatico=False):
+        permitidas = {
+            (self.Estado.QUORUM, self.Estado.RADICADA),
+            (self.Estado.RADICADA, self.Estado.APROBADA),
+            (self.Estado.RADICADA, self.Estado.RECHAZADA),
+        }
+        if automatico:
+            permitidas |= {
+                (self.Estado.ABIERTA, self.Estado.QUORUM),
+                (self.Estado.QUORUM, self.Estado.ABIERTA),
+            }
+        if (self.estado, nuevo_estado) not in permitidas:
+            raise TransicionInvalidaError(
+                f"No se puede cambiar de {self.estado} a {nuevo_estado}."
+            )
+        self.estado = nuevo_estado
+        self.save(update_fields=["estado"])
+
 
 class Adhesion(models.Model):
     propuesta = models.ForeignKey(
@@ -86,3 +141,60 @@ class Adhesion(models.Model):
 
     def __str__(self):
         return f"{self.usuario} - {self.propuesta}"
+
+    def clean(self):
+        """Validaciones del modelo"""
+        # Validar que el periodo esté abierto
+        if self.propuesta and self.propuesta.periodo and not self.propuesta.periodo.abierto:
+            raise ValidationError(
+                {"propuesta": "No se puede adherirse a una propuesta cuyo periodo está cerrado."}
+            )
+
+        # Validar que no estemos después de la fecha de cierre de propuestas
+        if (self.propuesta and self.propuesta.periodo and
+            self.propuesta.periodo.fecha_cierre_propuestas < timezone.now().date()):
+            raise ValidationError(
+                {"propuesta": "No se puede adherirse después de la fecha de cierre de propuestas."}
+            )
+
+        # Validar que el usuario haya autorizado el tratamiento de datos
+        if self.usuario and not self.usuario.autorizo_datos:
+            raise ValidationError(
+                {"usuario": "No se puede adherirse sin autorización de tratamiento de datos."}
+            )
+
+        # Validar que la propuesta no esté en estado RADICADA, APROBADA o RECHAZADA
+        if self.propuesta and self.propuesta.estado in [
+            Propuesta.Estado.RADICADA,
+            Propuesta.Estado.APROBADA,
+            Propuesta.Estado.RECHAZADA
+        ]:
+            raise ValidationError(
+                {"propuesta": "No se puede adherirse a una propuesta en estado RADICADA, APROBADA o RECHAZADA."}
+            )
+
+    def save(self, *args, **kwargs):
+        nueva = self._state.adding
+        self.full_clean(validate_constraints=False)
+        with transaction.atomic():
+            propuesta = Propuesta.objects.select_for_update().get(pk=self.propuesta_id)
+            self.propuesta = propuesta
+            self.full_clean(validate_constraints=False)
+            super().save(*args, **kwargs)
+            if nueva:
+                total = propuesta.adhesiones.count()
+                if total >= propuesta.periodo.cupo_minimo and propuesta.estado == Propuesta.Estado.ABIERTA:
+                    propuesta.cambiar_estado(Propuesta.Estado.QUORUM, automatico=True)
+
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            propuesta = Propuesta.objects.select_for_update().get(pk=self.propuesta_id)
+            self.propuesta = propuesta
+            if propuesta.estado not in (Propuesta.Estado.ABIERTA, Propuesta.Estado.QUORUM):
+                raise ValidationError("No se puede retirar la adhesión de una propuesta radicada o posterior.")
+            if not propuesta.periodo.abierto:
+                raise ValidationError("No se puede retirar la adhesión si el periodo está cerrado.")
+            result = super().delete(*args, **kwargs)
+            if propuesta.estado == Propuesta.Estado.QUORUM and propuesta.adhesiones.count() < propuesta.periodo.cupo_minimo:
+                propuesta.cambiar_estado(Propuesta.Estado.ABIERTA, automatico=True)
+            return result
