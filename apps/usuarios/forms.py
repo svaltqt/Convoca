@@ -87,3 +87,31 @@ class RegistroForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
+
+
+class UsuarioForm(forms.ModelForm):
+    """
+    Edición administrativa de una cuenta (HU-07): solo nombre, apellido y
+    programa. Nunca incluye la contraseña ni la autorización de datos, que
+    solo el propio usuario otorga al registrarse.
+    """
+
+    class Meta:
+        model = Usuario
+        fields = ("first_name", "last_name", "programa")
+        labels: ClassVar[dict[str, str]] = {
+            "first_name": "Nombres",
+            "last_name": "Apellidos",
+            "programa": "Programa",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        queryset = Programa.objects.filter(activo=True)
+        if (
+            self.instance.programa_id
+            and not queryset.filter(pk=self.instance.programa_id).exists()
+        ):
+            queryset = queryset | Programa.objects.filter(pk=self.instance.programa_id)
+        self.fields["programa"].queryset = queryset.order_by("nombre")
+        self.fields["programa"].empty_label = "Sin programa asignado"
