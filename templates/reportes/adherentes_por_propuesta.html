@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block titulo %}Adherentes por propuesta - Convoca{% endblock %}
+
+{% block content %}
+<header class="encabezado-listado">
+  <div>
+    <h1>Adherentes por propuesta</h1>
+    <p class="texto-secundario">Seleccione una propuesta para consultar sus adherentes y exportar a PDF.</p>
+  </div>
+</header>
+
+<form method="get" class="filtro-listado" style="margin-bottom: var(--espacio-6);">
+  <div class="campo" style="max-width: 40rem;">
+    <label class="campo__etiqueta" for="id_propuesta">Propuesta</label>
+    <select id="id_propuesta" name="propuesta" onchange="this.form.submit()">
+      <option value="">-- Seleccione una propuesta --</option>
+      {% for p in propuestas %}
+        <option value="{{ p.pk }}" {% if p.pk|stringformat:"s" == propuesta_seleccionada %}selected{% endif %}>
+          {{ p.asignatura.nombre }} - {{ p.periodo.nombre }} ({{ p.get_estado_display }})
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+</form>
+
+{% if propuesta_seleccionada %}
+  {% if adhesiones %}
+    <div class="adherentes-resumen">
+      <p><strong>{{ adhesiones|length }} adherente{{ adhesiones|length|pluralize }}</strong> en total.</p>
+      <a href="{% url 'reportes:adherentes_por_propuesta_pdf' %}?propuesta={{ propuesta_seleccionada }}" class="boton boton--secundario" style="margin-top: var(--espacio-3);">
+        Exportar a PDF
+      </a>
+    </div>
+
+    {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj mensaje_vacio="No hay adherentes para esta propuesta." %}
+  {% else %}
+    <div class="tabla-listado">
+      <p class="tabla-listado__vacio">No hay adherentes para la propuesta seleccionada.</p>
+    </div>
+  {% endif %}
+{% else %}
+  <div class="tabla-listado">
+    <p class="tabla-listado__vacio">Seleccione una propuesta para ver sus adherentes.</p>
+  </div>
+{% endif %}
+{% endblock %}

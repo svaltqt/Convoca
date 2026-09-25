@@ -11,8 +11,8 @@ dependencies = [
     "gunicorn>=26.2.0",
     "psycopg[binary]>=3.3.6",
     "python-decouple>=3.8",
-    "weasyprint>=70.0",
     "whitenoise>=6.12.0",
+    "xhtml2pdf>=0.2.20",
 ]
 
 [dependency-groups]

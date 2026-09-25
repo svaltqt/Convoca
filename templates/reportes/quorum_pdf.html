@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Estado de quórum por facultad</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 1.5cm;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.4;
+      color: #1c211f;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 18pt;
+    }
+    .header h1 {
+      font-size: 17pt;
+      font-weight: bold;
+      color: #00723a;
+      margin: 0 0 6pt 0;
+    }
+    .header .meta {
+      font-size: 9pt;
+      color: #52605a;
+      margin: 3pt 0;
+    }
+    table.separador {
+      margin-top: 10pt;
+      border-collapse: collapse;
+    }
+    h2.facultad {
+      font-size: 12pt;
+      color: #00723a;
+      margin: 16pt 0 4pt 0;
+    }
+    p.resumen {
+      font-size: 9pt;
+      color: #52605a;
+      margin: 0 0 6pt 0;
+    }
+    table.quorum {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+    table.quorum th,
+    table.quorum td {
+      padding: 5pt 6pt;
+      text-align: left;
+      vertical-align: middle;
+    }
+    table.quorum thead th {
+      background-color: #f3f6f4;
+      color: #1c211f;
+      font-weight: bold;
+      font-size: 8pt;
+      border-bottom: 2px solid #00723a;
+    }
+    table.quorum tbody tr {
+      border-bottom: 1px solid #d8ded9;
+    }
+    td.numero {
+      text-align: right;
+    }
+    .footer {
+      margin-top: 20pt;
+      font-size: 8pt;
+      color: #52605a;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Estado de quórum por facultad</h1>
+    <p class="meta">Generado el {{ fecha_generacion }}</p>
+    <p class="meta">Propuestas activas en periodos abiertos</p>
+    <table class="separador" width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="border-bottom: 3px solid #00723a; font-size: 1pt; line-height: 1pt;">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  {% for fac in facultades_con_datos %}
+    <h2 class="facultad">{{ fac.facultad.nombre }}</h2>
+    <p class="resumen">
+      Total interesados: <strong>{{ fac.total_interesados }}</strong> |
+      Cupo mínimo acumulado: <strong>{{ fac.total_cupo_minimo }}</strong> |
+      Avance: <strong>{{ fac.porcentaje }}%</strong>
+    </p>
+    <table class="quorum">
+      <thead>
+        <tr>
+          <th>Asignatura</th>
+          <th>Programa</th>
+          <th>Periodo</th>
+          <th>Estado</th>
+          <th>Interesados</th>
+          <th>Cupo mínimo</th>
+          <th>Avance</th>
+          <th>Días restantes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prop in fac.propuestas %}
+          <tr>
+            <td>{{ prop.asignatura.nombre }}</td>
+            <td>{{ prop.programa.nombre }}</td>
+            <td>{{ prop.periodo.nombre }}</td>
+            <td>{{ prop.estado_display }}</td>
+            <td class="numero">{{ prop.total_interesados }}</td>
+            <td class="numero">{{ prop.cupo_minimo }}</td>
+            <td class="numero">{{ prop.porcentaje }}%</td>
+            <td class="numero">{{ prop.dias_restantes }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% empty %}
+    <p style="text-align: center; color: #52605a;">No hay propuestas activas en periodos abiertos.</p>
+  {% endfor %}
+
+  <div class="footer">
+    <p>Convoca — Proyecto estudiantil del Politécnico Colombiano Jaime Isaza Cadavid. No es un canal oficial de la institución.</p>
+    <p>Este reporte registra intención de matrícula, no inscribe. La inscripción oficial se realiza por Universitas XXI en las fechas del calendario académico.</p>
+  </div>
+</body>
+</html>

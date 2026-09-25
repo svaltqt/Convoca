@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Listado de adherentes - {{ propuesta.asignatura.nombre }} - {{ propuesta.periodo.nombre }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #1c211f;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 24pt;
+    }
+    .header h1 {
+      font-size: 18pt;
+      font-weight: bold;
+      color: #00723a;
+      margin: 0 0 6pt 0;
+    }
+    .header .meta {
+      font-size: 9pt;
+      color: #52605a;
+      margin: 3pt 0;
+    }
+    table.separador {
+      margin-top: 12pt;
+      border-collapse: collapse;
+    }
+    .info-block {
+      margin-bottom: 18pt;
+      padding: 12pt;
+      background-color: #f3f6f4;
+      border-left: 4px solid #00723a;
+    }
+    .info-block table.resumen {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+    }
+    .info-block table.resumen td {
+      border: none;
+      padding: 2pt 6pt;
+      vertical-align: top;
+    }
+    .info-block .etiqueta {
+      font-size: 8pt;
+      font-weight: bold;
+      letter-spacing: 1pt;
+      text-transform: uppercase;
+      color: #52605a;
+    }
+    .info-block .valor {
+      font-weight: bold;
+    }
+    table.adherentes {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12pt;
+      font-size: 10pt;
+    }
+    table.adherentes th,
+    table.adherentes td {
+      padding: 6pt 8pt;
+      text-align: left;
+      vertical-align: middle;
+    }
+    table.adherentes thead th {
+      background-color: #f3f6f4;
+      color: #1c211f;
+      font-weight: bold;
+      font-size: 9pt;
+      border-bottom: 2px solid #00723a;
+    }
+    table.adherentes tbody tr {
+      border-bottom: 1px solid #d8ded9;
+    }
+    .footer {
+      margin-top: 24pt;
+      font-size: 8pt;
+      color: #52605a;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Listado de adherentes</h1>
+    <p class="meta">{{ propuesta.asignatura.nombre }} - {{ propuesta.periodo.nombre }}</p>
+    <p class="meta">Programa: {{ propuesta.asignatura.programa.nombre }} | Facultad: {{ propuesta.asignatura.programa.facultad.nombre }}</p>
+    <p class="meta">Estado de la propuesta: {{ propuesta.get_estado_display }}</p>
+    <table class="separador" width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="border-bottom: 3px solid #00723a; font-size: 1pt; line-height: 1pt;">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <div class="info-block">
+    <table class="resumen">
+      <tr>
+        <td>
+          <span class="etiqueta">Generado el</span><br>
+          <span class="valor">{{ fecha_generacion }}</span>
+        </td>
+        <td>
+          <span class="etiqueta">Cupo mínimo</span><br>
+          <span class="valor">{{ propuesta.periodo.cupo_minimo }}</span>
+        </td>
+        <td>
+          <span class="etiqueta">Total adherentes</span><br>
+          <span class="valor">{{ total }}</span>
+        </td>
+        <td>
+          <span class="etiqueta">Avance</span><br>
+          <span class="valor">{% widthratio total propuesta.periodo.cupo_minimo 100 as pct %}{% if pct > 100 %}100{% else %}{{ pct }}{% endif %}%</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <table class="adherentes">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Programa</th>
+        <th>Fecha de adhesión</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fila in filas %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ fila.nombre }}</td>
+          <td>{{ fila.programa }}</td>
+          <td>{{ fila.fecha }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4" style="text-align: center; color: #52605a;">No hay adherentes registrados.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <p>Total de adherentes: <strong>{{ total }}</strong></p>
+    <p>Convoca — Proyecto estudiantil del Politécnico Colombiano Jaime Isaza Cadavid. No es un canal oficial de la institución.</p>
+    <p>Este reporte registra intención de matrícula, no inscribe. La inscripción oficial se realiza por Universitas XXI en las fechas del calendario académico.</p>
+  </div>
+</body>
+</html>
