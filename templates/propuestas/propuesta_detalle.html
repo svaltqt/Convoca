@@ -82,7 +82,7 @@
         {% if not propuesta.periodo.abierto %}<p>El periodo está cerrado.</p>{% endif %}
         {% if fecha_vencida %}<p>Ha pasado la fecha límite para presentar propuestas.</p>{% endif %}
         {% if not user.autorizo_datos %}<p>No has autorizado el tratamiento de tus datos personales.</p>{% endif %}
-        {% if propuesta.estado != "ABIERTA" %}<p>La propuesta ya no está abierta para recibir adhesiones.</p>{% endif %}
+        {% if propuesta.estado != "ABIERTA" and propuesta.estado != "QUORUM" %}<p>La propuesta ya no está abierta para recibir adhesiones.</p>{% endif %}
       </div>
     {% endif %}
   </section>

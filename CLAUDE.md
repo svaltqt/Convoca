@@ -274,3 +274,5 @@ No implementar: integración con Universitas XXI, pagos, notificaciones por corr
 aplicación móvil, carga masiva de asignaturas desde archivos, ni Neon Auth u otros
 servicios de Neon distintos a la base de datos. Si algo de esto parece necesario,
 preguntar antes de implementarlo.
+
+Un estudiante puede apoyar varias propuestas simultáneamente aunque en la práctica solo pueda cursar un vacacional. La plataforma mide interés, no compromiso exclusivo, y el conteo debe leerse como una cota superior del número de matriculados.

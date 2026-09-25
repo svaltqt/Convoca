@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block titulo %}Editar usuario — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Editar usuario</h1>
+    <p class="texto-secundario">
+      Correo: {{ object.email }} · Autorización de tratamiento de datos: {% if object.autorizo_datos %}Sí, otorgada el {{ object.fecha_autorizacion|default:"(fecha no registrada)" }}{% else %}No{% endif %}
+    </p>
+  </header>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">Guardar</button>
+    <a href="{% url 'usuarios:usuario_lista' %}" class="boton boton--secundario">Cancelar</a>
+  </form>
+{% endblock %}

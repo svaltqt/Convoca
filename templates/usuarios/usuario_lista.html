@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block titulo %}Usuarios — Convoca{% endblock %}
+
+{% block content %}
+  <header class="encabezado-listado">
+    <div>
+      <h1>Usuarios</h1>
+      <p class="texto-secundario">Consulta las cuentas registradas y desactiva o reactiva su acceso. Las cuentas solo se crean por registro.</p>
+    </div>
+  </header>
+
+  {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado etiqueta_activas="Activos" etiqueta_inactivas="Inactivos" %}
+
+  {% include "componentes/tabla_listado.html" with encabezados=encabezados filas=filas page_obj=page_obj mensaje_vacio="No hay usuarios registrados." %}
+{% endblock %}
