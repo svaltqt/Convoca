@@ -220,8 +220,9 @@ La aplicación debe tener, y estas son las piezas evaluadas:
 - Login y menú con roles (estudiante / administrador)
 - **5 pantallas maestras:** facultades-programas, asignaturas, docentes, periodos, usuarios
 - **1 pantalla transaccional:** propuesta de curso con adhesiones y máquina de estados
-- **2 reportes:** (a) estado de quórum por facultad con porcentaje de avance y días
-  restantes; (b) listado de adherentes por propuesta, exportable a PDF
+- **2 reportes, exclusivos de administrador** (HU-15, HU-16 / RF-21, RF-22, RF-23):
+  (a) estado de quórum por facultad con porcentaje de avance y días restantes;
+  (b) listado de adherentes por propuesta, exportable a PDF
 - Publicada y accesible públicamente
 - Manual de usuario, manual de instalación y configuración, historias de usuario con
   criterios de aceptación, informe de ejecución de pruebas TDD
@@ -262,7 +263,10 @@ Aplica la Ley 1581 de 2012.
   código estudiantil.**
 - En la vista pública de una propuesta se muestran solo nombre y programa de los
   adherentes. Nunca el correo.
-- El listado de adherentes solo es visible para usuarios autenticados.
+- El listado de adherentes dentro del detalle de una propuesta (HU-14) es visible
+  para cualquier usuario autenticado, estudiante o administrador. Esto es distinto
+  de los reportes de la sección "Requisitos de la entrega", que son exclusivos de
+  administrador.
 - El PDF de adherentes incluye nombre y programa, nunca correo.
 - El administrador puede ver nombre, correo, programa y estado de autorización de los
   usuarios, y desactivar o reactivar cuentas. Nunca ve ni modifica contraseñas.
