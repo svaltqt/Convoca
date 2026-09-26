@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 import pytest
+from django.contrib.auth.models import Group
 from django.urls import reverse
 from model_bakery import baker
 
@@ -13,12 +14,18 @@ from apps.usuarios.models import Usuario
 def crear_administrador():
     # first_name evita que la cabecera muestre el correo del propio admin,
     # lo que confundiría las aserciones de privacidad sobre correos.
-    return Usuario.objects.create_user(
+    # is_staff sigue siendo lo que exige SoloAdministradoresMixin en las
+    # vistas de reportes; el grupo Administrador es lo que ahora controla
+    # la visibilidad del enlace de Reportes en el menú (tarea 1.4).
+    usuario = Usuario.objects.create_user(
         email="admin@elpoli.edu.co",
         password="clave-de-prueba",
         is_staff=True,
         first_name="Admin",
     )
+    grupo, _ = Group.objects.get_or_create(name="Administrador")
+    usuario.groups.add(grupo)
+    return usuario
 
 
 def crear_estudiante(autoriza_datos=True):

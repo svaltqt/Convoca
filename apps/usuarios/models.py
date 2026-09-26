@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
@@ -52,3 +53,13 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    @property
+    def es_administrador(self):
+        """
+        Pertenece al grupo Administrador (tarea 1.3). Es lo que controla la
+        visibilidad de las opciones de administrador en el menú (tarea 1.4);
+        el acceso real a las vistas de maestras se resuelve por separado en
+        config/views.py.
+        """
+        return self.groups.filter(name=settings.NOMBRE_GRUPO_ADMINISTRADOR).exists()

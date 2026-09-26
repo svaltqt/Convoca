@@ -136,3 +136,8 @@ LOGOUT_REDIRECT_URL = "inicio"
 
 # Dominio de correo institucional exigido en el registro (HU-01/HU-02).
 DOMINIO_INSTITUCIONAL = "elpoli.edu.co"
+
+# Grupos de roles (tarea 1.3/1.4). Todo usuario autenticado que no pertenece
+# al grupo Administrador se trata como Estudiante por defecto.
+NOMBRE_GRUPO_ADMINISTRADOR = "Administrador"
+NOMBRE_GRUPO_ESTUDIANTE = "Estudiante"
