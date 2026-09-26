@@ -10,6 +10,8 @@ Contexto esperado:
   titulo         — encabezado de la página ("Desactivar asignatura").
   entidad        — cómo se nombra el registro en la pregunta ("la asignatura").
   nombre_objeto  — nombre del registro, se muestra en negrita.
+  detalle_objeto — opcional; dato extra entre paréntesis tras el nombre
+                   (p. ej. el correo en la maestra de usuarios).
   consecuencia   — qué implica el cambio (se conserva el historial, etc.).
   url_cancelar   — URL a la que vuelve el botón Cancelar.
   peligro        — True para desactivar (borde rojo y botón de peligro);
@@ -20,7 +22,7 @@ Contexto esperado:
   <h1>{{ titulo }}</h1>
 
   <p>
-    ¿Deseas {{ texto_confirmar|lower }} {{ entidad }} <strong>{{ nombre_objeto }}</strong>?
+    ¿Deseas {{ texto_confirmar|lower }} {{ entidad }} <strong>{{ nombre_objeto }}</strong>{% if detalle_objeto %} ({{ detalle_objeto }}){% endif %}?
     {{ consecuencia }}
   </p>
 
