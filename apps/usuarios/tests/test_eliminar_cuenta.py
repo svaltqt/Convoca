@@ -11,6 +11,7 @@ Fuera de este ciclo: propuestas RADICADA o posteriores con anonimización
 import datetime
 
 import pytest
+from django.core.validators import validate_email
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -42,6 +43,36 @@ def crear_propuesta(cupo_minimo=20):
     return Propuesta.objects.create(
         asignatura=asignatura, periodo=periodo, creador=crear_estudiante()
     )
+
+
+def adherir_a_propuesta_en_estado(usuario, estado):
+    """
+    Adhesion.clean() no permite adherirse a una propuesta RADICADA o
+    posterior, así que la adhesión se crea con la propuesta ABIERTA y el
+    estado se lleva luego al valor pedido directamente en la BD.
+    """
+    propuesta = crear_propuesta(cupo_minimo=20)
+    adhesion = Adhesion.objects.create(propuesta=propuesta, usuario=usuario)
+    Propuesta.objects.filter(pk=propuesta.pk).update(estado=estado)
+    return adhesion
+
+
+def crear_estudiante_identificable(email):
+    return baker.make(
+        Usuario,
+        first_name="Ana",
+        last_name="Gómez",
+        email=email,
+        autorizo_datos=True,
+        fecha_autorizacion=timezone.now(),
+    )
+
+
+def assert_anonimizado(usuario):
+    assert usuario.first_name != "Ana"
+    assert usuario.last_name != "Gómez"
+    assert "ana" not in usuario.email.lower()
+    validate_email(usuario.email)
 
 
 @pytest.mark.django_db
@@ -103,6 +134,105 @@ def test_eliminar_cuenta_con_periodo_cerrado_borra_la_adhesion_y_recalcula_el_es
     assert not Adhesion.objects.filter(usuario=usuario).exists()
     assert propuesta.estado == Propuesta.Estado.ABIERTA
     assert usuario.is_active is False
+
+
+@pytest.mark.django_db
+def test_eliminar_cuenta_sin_adhesiones_anonimiza_al_usuario():
+    """Derecho de supresión (Ley 1581, RNF-02): siempre se anonimiza."""
+    usuario = crear_estudiante_identificable("ana.gomez@elpoli.edu.co")
+
+    eliminar_cuenta(usuario)
+
+    usuario.refresh_from_db()
+    assert_anonimizado(usuario)
+
+
+@pytest.mark.django_db
+def test_eliminar_cuenta_solo_con_adhesiones_abiertas_anonimiza_al_usuario():
+    usuario = crear_estudiante_identificable("ana.gomez@elpoli.edu.co")
+    Adhesion.objects.create(propuesta=crear_propuesta(), usuario=usuario)
+
+    eliminar_cuenta(usuario)
+
+    usuario.refresh_from_db()
+    assert not Adhesion.objects.filter(usuario=usuario).exists()
+    assert_anonimizado(usuario)
+
+
+@pytest.mark.django_db
+def test_eliminar_cuenta_conserva_la_adhesion_radicada_y_anonimiza_al_usuario():
+    usuario = crear_estudiante_identificable("ana.gomez@elpoli.edu.co")
+    adhesion = adherir_a_propuesta_en_estado(usuario, Propuesta.Estado.RADICADA)
+
+    eliminar_cuenta(usuario)
+
+    usuario.refresh_from_db()
+    assert Adhesion.objects.filter(pk=adhesion.pk).exists()
+    assert_anonimizado(usuario)
+
+
+@pytest.mark.django_db
+def test_eliminar_cuenta_conserva_la_adhesion_aprobada_y_anonimiza_al_usuario():
+    usuario = crear_estudiante_identificable("ana.gomez@elpoli.edu.co")
+    adhesion = adherir_a_propuesta_en_estado(usuario, Propuesta.Estado.APROBADA)
+
+    eliminar_cuenta(usuario)
+
+    usuario.refresh_from_db()
+    assert Adhesion.objects.filter(pk=adhesion.pk).exists()
+    assert_anonimizado(usuario)
+
+
+@pytest.mark.django_db
+def test_eliminar_cuenta_conserva_la_adhesion_rechazada_y_anonimiza_al_usuario():
+    usuario = crear_estudiante_identificable("ana.gomez@elpoli.edu.co")
+    adhesion = adherir_a_propuesta_en_estado(usuario, Propuesta.Estado.RECHAZADA)
+
+    eliminar_cuenta(usuario)
+
+    usuario.refresh_from_db()
+    assert Adhesion.objects.filter(pk=adhesion.pk).exists()
+    assert_anonimizado(usuario)
+
+
+@pytest.mark.django_db
+def test_correos_anonimizados_de_dos_cuentas_eliminadas_no_colisionan():
+    primero = crear_estudiante_identificable("ana.gomez@elpoli.edu.co")
+    segundo = crear_estudiante_identificable("ana.rojas@elpoli.edu.co")
+    adherir_a_propuesta_en_estado(primero, Propuesta.Estado.RADICADA)
+    adherir_a_propuesta_en_estado(segundo, Propuesta.Estado.RADICADA)
+
+    eliminar_cuenta(primero)
+    eliminar_cuenta(segundo)
+
+    primero.refresh_from_db()
+    segundo.refresh_from_db()
+    assert_anonimizado(primero)
+    assert_anonimizado(segundo)
+    assert primero.email != segundo.email
+
+
+@pytest.mark.django_db
+def test_eliminar_cuenta_conserva_la_radicada_y_retira_la_abierta_en_la_misma_operacion():
+    usuario = crear_estudiante_identificable("ana.gomez@elpoli.edu.co")
+    adhesion_radicada = adherir_a_propuesta_en_estado(
+        usuario, Propuesta.Estado.RADICADA
+    )
+    propuesta_abierta = crear_propuesta(cupo_minimo=2)
+    Adhesion.objects.create(propuesta=propuesta_abierta, usuario=usuario)
+    propuesta_abierta.refresh_from_db()
+    assert propuesta_abierta.estado == Propuesta.Estado.QUORUM
+
+    eliminar_cuenta(usuario)
+
+    usuario.refresh_from_db()
+    propuesta_abierta.refresh_from_db()
+    assert Adhesion.objects.filter(pk=adhesion_radicada.pk).exists()
+    assert not Adhesion.objects.filter(
+        propuesta=propuesta_abierta, usuario=usuario
+    ).exists()
+    assert propuesta_abierta.estado == Propuesta.Estado.ABIERTA
+    assert_anonimizado(usuario)
 
 
 @pytest.mark.django_db
