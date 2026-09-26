@@ -20,17 +20,20 @@ formulario.
 {% endcomment %}
 {% if form.errors %}
   <div class="formulario__error-general" role="alert">
-    <p class="formulario__error-titulo">Revisa lo siguiente antes de continuar:</p>
-    <ul>
-      {% for error in form.non_field_errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-      {% for field in form %}
-        {% for error in field.errors %}
-          <li>{{ field.label }}: {{ error }}</li>
+    {% include "componentes/icono.html" with nombre="error" clase="icono--error-resumen" %}
+    <div>
+      <p class="formulario__error-titulo">Revisa lo siguiente antes de continuar:</p>
+      <ul>
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
         {% endfor %}
-      {% endfor %}
-    </ul>
+        {% for field in form %}
+          {% for error in field.errors %}
+            <li>{{ field.label }}: {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
   </div>
 {% endif %}
 

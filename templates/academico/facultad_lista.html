@@ -8,7 +8,7 @@
       <h1>Facultades</h1>
       <p class="texto-secundario">Crea, modifica y desactiva las facultades que agrupan los programas académicos.</p>
     </div>
-    <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear }}</a>
+    <a href="{{ url_crear }}" class="boton boton--primario">{% include "componentes/icono.html" with nombre="agregar" %}{{ texto_crear }}</a>
   </header>
 
   {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado %}

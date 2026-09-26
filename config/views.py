@@ -109,22 +109,27 @@ class ListaConBusquedaView(SoloGrupoAdministradorMixin, ListView):
         )
 
     def construir_acciones(self, objeto, activo):
-        """Celda de acciones estándar: Editar + Desactivar o Reactivar."""
+        """Celda de acciones estándar: Editar + Desactivar o Reactivar.
+
+        Las clases accion--editar / accion--desactivar / accion--reactivar
+        permiten a estilos.css añadir el icono correspondiente con una
+        máscara CSS; el texto del enlace se mantiene como nombre accesible.
+        """
         acciones = format_html(
-            '<a href="{}">Editar</a>',
+            '<a href="{}" class="accion accion--editar">Editar</a>',
             reverse(self.url_name_editar, args=[objeto.pk]),
         )
         if activo:
             enlace_estado = format_html(
-                '<a href="{}" class="enlace-peligro">Desactivar</a>',
+                '<a href="{}" class="accion accion--desactivar enlace-peligro">Desactivar</a>',
                 reverse(self.url_name_desactivar, args=[objeto.pk]),
             )
         else:
             enlace_estado = format_html(
-                '<a href="{}">Reactivar</a>',
+                '<a href="{}" class="accion accion--reactivar">Reactivar</a>',
                 reverse(self.url_name_reactivar, args=[objeto.pk]),
             )
-        return format_html("{} · {}", acciones, enlace_estado)
+        return format_html('<span class="tabla-acciones">{}{}</span>', acciones, enlace_estado)
 
     def get_url_crear(self):
         return None

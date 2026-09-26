@@ -3,15 +3,6 @@
 {% block titulo %}Desactivar facultad — Convoca{% endblock %}
 
 {% block content %}
-  <header>
-    <h1>Desactivar facultad</h1>
-  </header>
-
-  <p>¿Deseas desactivar la facultad <strong>{{ object.nombre }}</strong>? Sus programas y asignaturas conservan la referencia; solo deja de estar disponible para nuevas propuestas.</p>
-
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="boton boton--peligro">Desactivar</button>
-    <a href="{% url 'academico:facultad_lista' %}" class="boton boton--secundario">Cancelar</a>
-  </form>
+  {% url 'academico:facultad_lista' as url_lista %}
+  {% include "componentes/confirmar_estado.html" with titulo="Desactivar facultad" entidad="la facultad" nombre_objeto=object.nombre consecuencia="Sus programas y asignaturas conservan la referencia; solo deja de estar disponible para nuevas propuestas." url_cancelar=url_lista peligro=True texto_confirmar="Desactivar" %}
 {% endblock %}

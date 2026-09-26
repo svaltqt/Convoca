@@ -8,7 +8,7 @@
       <h1>Periodos</h1>
       <p class="texto-secundario">Gestiona los periodos académicos en los que se pueden crear propuestas de cursos.</p>
     </div>
-    <a href="{{ url_crear }}" class="boton boton--primario">{{ texto_crear }}</a>
+    <a href="{{ url_crear }}" class="boton boton--primario">{% include "componentes/icono.html" with nombre="agregar" %}{{ texto_crear }}</a>
   </header>
 
   {% include "componentes/filtro_listado.html" with busqueda=busqueda estado=estado %}

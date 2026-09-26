@@ -1,0 +1,36 @@
+{% comment %}
+Panel de confirmación para activar / desactivar un registro de maestra
+(borrado lógico, nunca físico). Compartido por todas las pantallas
+*_confirmar_desactivar.html y *_confirmar_reactivar.html.
+
+Uso:
+  {% include "componentes/confirmar_estado.html" with titulo="Desactivar facultad" entidad="la facultad" nombre_objeto=object.nombre consecuencia="Sus programas y asignaturas conservan la referencia." url_cancelar=url_lista peligro=True texto_confirmar="Desactivar" %}
+
+Contexto esperado:
+  titulo         — encabezado de la página ("Desactivar asignatura").
+  entidad        — cómo se nombra el registro en la pregunta ("la asignatura").
+  nombre_objeto  — nombre del registro, se muestra en negrita.
+  consecuencia   — qué implica el cambio (se conserva el historial, etc.).
+  url_cancelar   — URL a la que vuelve el botón Cancelar.
+  peligro        — True para desactivar (borde rojo y botón de peligro);
+                   omitirlo o False para reactivar (verde institucional).
+  texto_confirmar— texto del botón principal ("Desactivar" / "Reactivar").
+{% endcomment %}
+<div class="confirmacion{% if peligro %} confirmacion--peligro{% endif %}">
+  <h1>{{ titulo }}</h1>
+
+  <p>
+    ¿Deseas {{ texto_confirmar|lower }} {{ entidad }} <strong>{{ nombre_objeto }}</strong>?
+    {{ consecuencia }}
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    {% if peligro %}
+      <button type="submit" class="boton boton--peligro">{% include "componentes/icono.html" with nombre="desactivar" %}{{ texto_confirmar }}</button>
+    {% else %}
+      <button type="submit" class="boton boton--primario">{% include "componentes/icono.html" with nombre="reactivar" %}{{ texto_confirmar }}</button>
+    {% endif %}
+    <a href="{{ url_cancelar }}" class="boton boton--secundario">Cancelar</a>
+  </form>
+</div>
