@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth.models import Group
 from django.urls import reverse
 from model_bakery import baker
 
@@ -7,9 +8,17 @@ from apps.usuarios.models import Usuario
 
 
 def crear_administrador():
-    return Usuario.objects.create_user(
+    """
+    Administrador de prueba: is_staff (para las vistas que aún dependen de
+    él) y miembro del grupo Administrador (para las vistas genéricas de
+    maestras, que a partir de la tarea 1.3 verifican pertenencia al grupo).
+    """
+    usuario = Usuario.objects.create_user(
         email="admin@elpoli.edu.co", password="clave-de-prueba", is_staff=True
     )
+    grupo, _ = Group.objects.get_or_create(name="Administrador")
+    usuario.groups.add(grupo)
+    return usuario
 
 
 def crear_estudiante():

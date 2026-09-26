@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth.models import Group
 from django.urls import reverse
 from model_bakery import baker
 
@@ -7,9 +8,17 @@ from apps.usuarios.models import Usuario
 
 
 def crear_administrador():
-    return Usuario.objects.create_user(
+    """
+    Administrador de prueba: is_staff (para las vistas que aún dependen de
+    él) y miembro del grupo Administrador (para las vistas genéricas de
+    maestras, que a partir de la tarea 1.3 verifican pertenencia al grupo).
+    """
+    usuario = Usuario.objects.create_user(
         email="admin@elpoli.edu.co", password="clave-de-prueba", is_staff=True
     )
+    grupo, _ = Group.objects.get_or_create(name="Administrador")
+    usuario.groups.add(grupo)
+    return usuario
 
 
 def crear_estudiante():
@@ -225,3 +234,20 @@ def test_reactivar_programa_lo_vuelve_a_marcar_como_activo(client):
 
     assert respuesta.status_code == 302
     assert programa.activo is True
+
+
+@pytest.mark.django_db
+def test_listado_de_programas_hereda_el_permiso_del_grupo_administrador(client):
+    """
+    Confirma que ProgramaListView hereda de ListaConBusquedaView la
+    verificación de grupo (tarea 1.3) sin reimplementarla: un usuario sin
+    is_staff pero miembro del grupo Administrador puede consultar el listado.
+    """
+    usuario = baker.make(Usuario, is_staff=False)
+    grupo, _ = Group.objects.get_or_create(name="Administrador")
+    usuario.groups.add(grupo)
+    client.force_login(usuario)
+
+    respuesta = client.get(reverse("academico:programa_lista"))
+
+    assert respuesta.status_code == 200
