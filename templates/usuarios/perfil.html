@@ -15,4 +15,10 @@
     {% include "componentes/formulario.html" with form=form %}
     <button type="submit" class="boton boton--primario">Guardar</button>
   </form>
+
+  <section aria-labelledby="titulo-eliminar-cuenta">
+    <h2 id="titulo-eliminar-cuenta">Eliminar mi cuenta</h2>
+    <p class="texto-secundario">Puedes eliminar tu cuenta en cualquier momento. Se te pedirá confirmación antes de hacerlo.</p>
+    <a href="{% url 'usuarios:eliminar_cuenta' %}" class="boton boton--peligro">Eliminar mi cuenta</a>
+  </section>
 {% endblock %}

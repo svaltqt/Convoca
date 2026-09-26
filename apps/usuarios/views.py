@@ -1,7 +1,9 @@
 from django.contrib import messages
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView, UpdateView
 
@@ -15,6 +17,7 @@ from config.views import (
 
 from .forms import FormularioLogin, RegistroForm, UsuarioForm
 from .models import Usuario
+from .services import eliminar_cuenta
 
 
 class EntrarView(LoginView):
@@ -61,6 +64,22 @@ class PerfilView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+
+class EliminarCuentaView(LoginRequiredMixin, TemplateView):
+    """
+    GET muestra la confirmación; solo el POST del botón de confirmar
+    elimina la cuenta, para evitar una eliminación por un clic accidental.
+    Siempre actúa sobre request.user.
+    """
+
+    template_name = "usuarios/eliminar_cuenta.html"
+
+    def post(self, request, *args, **kwargs):
+        eliminar_cuenta(request.user)
+        logout(request)
+        messages.success(request, "Tu cuenta fue eliminada.")
+        return redirect("inicio")
 
 
 class UsuarioListView(ListaConBusquedaView):

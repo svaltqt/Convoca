@@ -10,6 +10,11 @@ urlpatterns = [
     path("registro/", views.RegistroView.as_view(), name="registro"),
     path("politica-datos/", views.PoliticaDatosView.as_view(), name="politica_datos"),
     path("perfil/", views.PerfilView.as_view(), name="perfil"),
+    path(
+        "perfil/eliminar/",
+        views.EliminarCuentaView.as_view(),
+        name="eliminar_cuenta",
+    ),
     path("usuarios/", views.UsuarioListView.as_view(), name="usuario_lista"),
     path(
         "usuarios/<int:pk>/editar/",
