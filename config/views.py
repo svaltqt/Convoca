@@ -12,7 +12,7 @@ from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.detail import SingleObjectMixin
 
-from .mixins import SoloAdministradoresMixin
+from .mixins import SoloAdministradoresMixin, SoloGrupoAdministradorMixin
 
 """
 Vistas base para las pantallas maestras (facultades, programas, asignaturas,
@@ -22,7 +22,7 @@ búsqueda, encabezados de la tabla y cómo se arma cada fila.
 """
 
 
-class ListaConBusquedaView(SoloAdministradoresMixin, ListView):
+class ListaConBusquedaView(SoloGrupoAdministradorMixin, ListView):
     """
     Listado con búsqueda de texto (parámetro ``q``), filtro por estado,
     filtro opcional por una relación (FK) y paginación, listo para el
@@ -159,7 +159,7 @@ class EditarMaestraView(SoloAdministradoresMixin, SuccessMessageMixin, UpdateVie
 
 
 class CambiarEstadoView(
-    SoloAdministradoresMixin, SingleObjectMixin, TemplateResponseMixin, View
+    SoloGrupoAdministradorMixin, SingleObjectMixin, TemplateResponseMixin, View
 ):
     """
     Cambio de estado lógico genérico (activar o desactivar): nunca elimina
