@@ -56,7 +56,7 @@
         <ul class="navegacion__lista">
           {% if user.is_authenticated %}
             <li><a href="{% url 'propuestas:propuesta_lista' %}">{% include "componentes/icono.html" with nombre="propuestas" %}Propuestas</a></li>
-            {% if user.is_staff %}
+            {% if user.es_administrador %}
               <li class="navegacion__item-con-submenu">
                 <a href="{% url 'reportes:index' %}" class="navegacion__enlace-con-submenu">{% include "componentes/icono.html" with nombre="reportes" %}Reportes</a>
                 <ul class="navegacion__submenu">

@@ -1,9 +1,5 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
-#: nombres de los grupos de roles (tarea 1.3). Todo usuario autenticado que
-#: no pertenece al grupo Administrador se trata como Estudiante por defecto.
-NOMBRE_GRUPO_ADMINISTRADOR = "Administrador"
-NOMBRE_GRUPO_ESTUDIANTE = "Estudiante"
 
 
 class SoloAdministradoresMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -21,4 +17,6 @@ class SoloGrupoAdministradorMixin(LoginRequiredMixin, UserPassesTestMixin):
     """
 
     def test_func(self):
-        return self.request.user.groups.filter(name=NOMBRE_GRUPO_ADMINISTRADOR).exists()
+        return self.request.user.groups.filter(
+            name=settings.NOMBRE_GRUPO_ADMINISTRADOR
+        ).exists()
