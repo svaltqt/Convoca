@@ -1,7 +1,9 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, UpdateView
 
 from apps.academico.models import Programa
 from config.views import (
@@ -40,6 +42,25 @@ class RegistroView(CreateView):
 
 class PoliticaDatosView(TemplateView):
     template_name = "usuarios/politica_datos.html"
+
+
+class PerfilView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    """
+    Perfil del propio usuario (tarea 1.6 / HU-17, primer criterio): ver y
+    editar nombre, apellido y programa. Correo y autorización de datos no
+    son editables aquí. get_object() siempre devuelve request.user, sin
+    depender de un pk en la URL, así que nadie puede ver o editar el
+    perfil de otra cuenta desde esta vista, ni siquiera un administrador.
+    """
+
+    model = Usuario
+    form_class = UsuarioForm
+    template_name = "usuarios/perfil.html"
+    success_url = reverse_lazy("usuarios:perfil")
+    success_message = "Se actualizó tu perfil."
+
+    def get_object(self, queryset=None):
+        return self.request.user
 
 
 class UsuarioListView(ListaConBusquedaView):
