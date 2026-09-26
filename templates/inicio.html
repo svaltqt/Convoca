@@ -49,6 +49,11 @@
           <strong>Periodos</strong>
           <span>Periodos vacacionales y sus cupos mínimos.</span>
         </a>
+        <a href="{% url 'usuarios:usuario_lista' %}" class="tarjeta-modulo">
+          {% include "componentes/icono.html" with nombre="usuarios" %}
+          <strong>Usuarios</strong>
+          <span>Cuentas registradas, autorización de datos y acceso.</span>
+        </a>
         <a href="{% url 'reportes:index' %}" class="tarjeta-modulo">
           {% include "componentes/icono.html" with nombre="reportes" %}
           <strong>Reportes</strong>

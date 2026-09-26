@@ -3,15 +3,6 @@
 {% block titulo %}Desactivar usuario — Convoca{% endblock %}
 
 {% block content %}
-  <header>
-    <h1>Desactivar usuario</h1>
-  </header>
-
-  <p>¿Deseas desactivar la cuenta de <strong>{{ object.first_name }} {{ object.last_name }}</strong> ({{ object.email }})? No podrá iniciar sesión mientras esté desactivada.</p>
-
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="boton boton--peligro">Desactivar</button>
-    <a href="{% url 'usuarios:usuario_lista' %}" class="boton boton--secundario">Cancelar</a>
-  </form>
+  {% url 'usuarios:usuario_lista' as url_lista %}
+  {% include "componentes/confirmar_estado.html" with titulo="Desactivar usuario" entidad="la cuenta de" nombre_objeto=object.get_full_name detalle_objeto=object.email consecuencia="No podrá iniciar sesión mientras esté desactivada." url_cancelar=url_lista peligro=True texto_confirmar="Desactivar" %}
 {% endblock %}
