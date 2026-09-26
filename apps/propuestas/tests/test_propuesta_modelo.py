@@ -431,3 +431,27 @@ def test_propuesta_muestra_adherentes_con_nombre_y_programa_sin_correo():
         assert usuario.last_name is not None   # Apellido presente
         # En la vista pública, nunca debería mostrarse el correo
         # Esto se verificará en las pruebas de vistas
+
+
+@pytest.mark.django_db
+def test_administrador_puede_radicar_propuesta_con_periodo_cerrado():
+    """
+    Regresión (regla 16): radicar no depende del estado del periodo. Antes
+    del ajuste de Propuesta.clean() en el criterio 2 de HU-17, clean()
+    revalidaba "periodo abierto" en cada save() y bloqueaba esta transición.
+    """
+    periodo = baker.make(Periodo, abierto=True, fecha_cierre_propuestas=timezone.localdate())
+    asignatura = baker.make(Asignatura, activa=True)
+    propuesta = Propuesta.objects.create(
+        asignatura=asignatura,
+        periodo=periodo,
+        creador=crear_estudiante(),
+        estado=Propuesta.Estado.QUORUM,
+    )
+    Periodo.objects.filter(pk=periodo.pk).update(abierto=False)
+    propuesta.refresh_from_db()
+
+    propuesta.cambiar_estado(Propuesta.Estado.RADICADA)
+
+    propuesta.refresh_from_db()
+    assert propuesta.estado == Propuesta.Estado.RADICADA
