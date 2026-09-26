@@ -29,13 +29,13 @@
         {% if user.is_authenticated %}
           <div class="cabecera__usuario">
             {% include "componentes/icono.html" with nombre="usuario" %}
-            <span class="cabecera__usuario-nombre">
+            <a href="{% url 'usuarios:perfil' %}" class="cabecera__usuario-nombre">
               {% if ocultar_email_usuario %}
                 {{ user.first_name|default:"Usuario" }}
               {% else %}
                 {{ user.first_name|default:user.email }}
               {% endif %}
-            </span>
+            </a>
             <form method="post" action="{% url 'usuarios:salir' %}">
               {% csrf_token %}
               <button type="submit" class="enlace-boton enlace-icono">{% include "componentes/icono.html" with nombre="salir" %}Cerrar sesión</button>

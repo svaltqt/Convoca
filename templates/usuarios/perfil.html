@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mi perfil — Convoca{% endblock %}
+
+{% block content %}
+  <header>
+    <h1>Mi perfil</h1>
+    <p class="texto-secundario">
+      Correo: {{ object.email }} · Autorización de tratamiento de datos: {% if object.autorizo_datos %}Sí, otorgada el {{ object.fecha_autorizacion|default:"(fecha no registrada)" }}{% else %}No{% endif %}
+    </p>
+  </header>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "componentes/formulario.html" with form=form %}
+    <button type="submit" class="boton boton--primario">Guardar</button>
+  </form>
+
+  <section aria-labelledby="titulo-eliminar-cuenta">
+    <h2 id="titulo-eliminar-cuenta">Eliminar mi cuenta</h2>
+    <p class="texto-secundario">Puedes eliminar tu cuenta en cualquier momento. Se te pedirá confirmación antes de hacerlo.</p>
+    <a href="{% url 'usuarios:eliminar_cuenta' %}" class="boton boton--peligro">Eliminar mi cuenta</a>
+  </section>
+{% endblock %}
