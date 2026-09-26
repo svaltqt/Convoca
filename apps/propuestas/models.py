@@ -70,8 +70,14 @@ class Propuesta(models.Model):
         return self.adhesiones.count()
 
     def clean(self):
-        """Validaciones del modelo"""
-        # Validar que la asignatura esté activa
+        """
+        Regla 4: condiciones para crear una propuesta. Solo aplican al crearla;
+        una propuesta existente debe poder cambiar de estado aunque luego el
+        periodo cierre o la asignatura se desactive.
+        """
+        if not self._state.adding:
+            return
+
         if self.asignatura and not self.asignatura.activa:
             raise ValidationError(
                 {"asignatura": "No se puede crear una propuesta con una asignatura inactiva."}
@@ -112,6 +118,14 @@ class Propuesta(models.Model):
             )
         self.estado = nuevo_estado
         self.save(update_fields=["estado"])
+
+    def recalcular_estado_tras_retiro(self):
+        """Regla 15: QUORUM vuelve a ABIERTA si queda por debajo del cupo."""
+        if (
+            self.estado == self.Estado.QUORUM
+            and self.adhesiones.count() < self.periodo.cupo_minimo
+        ):
+            self.cambiar_estado(self.Estado.ABIERTA, automatico=True)
 
 
 class Adhesion(models.Model):
@@ -195,6 +209,5 @@ class Adhesion(models.Model):
             if not propuesta.periodo.abierto:
                 raise ValidationError("No se puede retirar la adhesión si el periodo está cerrado.")
             result = super().delete(*args, **kwargs)
-            if propuesta.estado == Propuesta.Estado.QUORUM and propuesta.adhesiones.count() < propuesta.periodo.cupo_minimo:
-                propuesta.cambiar_estado(Propuesta.Estado.ABIERTA, automatico=True)
+            propuesta.recalcular_estado_tras_retiro()
             return result
