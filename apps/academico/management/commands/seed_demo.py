@@ -144,6 +144,9 @@ class Command(BaseCommand):
         Adhesion.objects.all().delete()
         Propuesta.objects.all().delete()
         Usuario.objects.filter(is_superuser=False).delete()
+        # Los superusuarios se conservan; si tienen programa, Usuario.programa
+        # (PROTECT) impediría borrar los programas.
+        Usuario.objects.update(programa=None)
         Asignatura.objects.all().delete()
         Docente.objects.all().delete()
         Programa.objects.all().delete()
@@ -259,14 +262,32 @@ class Command(BaseCommand):
 
         for escenario in escenarios:
             adherentes = aleatorio.sample(estudiantes, escenario["num_adhesiones"])
+            # Toda propuesta nace ABIERTA (regla 6) y su creador queda
+            # adherido automáticamente (regla 7), por eso se omite adherentes[0].
             propuesta = Propuesta.objects.create(
                 asignatura=asignaturas[escenario["asignatura"]],
                 periodo=periodo,
                 creador=adherentes[0],
-                estado=escenario["estado"],
             )
+            for usuario in adherentes[1:]:
+                Adhesion.objects.create(propuesta=propuesta, usuario=usuario)
+            propuesta.refresh_from_db()
+            self._llevar_a_estado(propuesta, escenario["estado"])
             Propuesta.objects.filter(pk=propuesta.pk).update(
                 creada=ahora - datetime.timedelta(days=escenario["dias_atras"])
             )
-            for usuario in adherentes:
-                Adhesion.objects.create(propuesta=propuesta, usuario=usuario)
+
+    def _llevar_a_estado(self, propuesta, estado):
+        """
+        ABIERTA→QUORUM ya ocurrió sola al alcanzar el cupo; RADICADA y los
+        estados finales se alcanzan con las transiciones del administrador
+        (regla 16), no escribiendo el estado directamente.
+        """
+        if estado in (
+            Propuesta.Estado.RADICADA,
+            Propuesta.Estado.APROBADA,
+            Propuesta.Estado.RECHAZADA,
+        ):
+            propuesta.cambiar_estado(Propuesta.Estado.RADICADA)
+        if estado in (Propuesta.Estado.APROBADA, Propuesta.Estado.RECHAZADA):
+            propuesta.cambiar_estado(estado)
