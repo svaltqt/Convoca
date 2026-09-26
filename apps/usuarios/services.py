@@ -15,9 +15,9 @@ def eliminar_cuenta(usuario):
     periodo abierto (regla 11); la eliminación de cuenta es un derecho de
     supresión (Ley 1581) y procede aunque el periodo esté cerrado.
 
-    La cuenta no se borra físicamente: creador y usuario de adhesión son
-    PROTECT, y el criterio 3 necesitará conservar la fila para anonimizarla.
-    Las adhesiones a propuestas RADICADA o posteriores no se tocan aquí.
+    Las adhesiones a propuestas RADICADA o posteriores se conservan (regla
+    19). El usuario siempre se anonimiza. La cuenta no se borra
+    físicamente: creador y usuario de adhesión son PROTECT.
     """
     with transaction.atomic():
         adhesiones = list(
@@ -33,5 +33,19 @@ def eliminar_cuenta(usuario):
                 continue
             Adhesion.objects.filter(pk=adhesion.pk).delete()
             propuesta.recalcular_estado_tras_retiro()
+
+        anonimizar(usuario)
         usuario.is_active = False
-        usuario.save(update_fields=["is_active"])
+        usuario.save(update_fields=["is_active", "first_name", "last_name", "email"])
+
+
+def anonimizar(usuario):
+    """
+    Derecho de supresión (Ley 1581, RNF-02): al eliminar la cuenta no quedan
+    datos personales reales, tenga o no adhesiones conservadas (regla 19).
+    El correo se construye con el pk para que siga siendo único; el dominio
+    .invalid está reservado (RFC 2606) y nunca recibe correo.
+    """
+    usuario.first_name = "Usuario"
+    usuario.last_name = "eliminado"
+    usuario.email = f"eliminado-{usuario.pk}@anonimo.invalid"
